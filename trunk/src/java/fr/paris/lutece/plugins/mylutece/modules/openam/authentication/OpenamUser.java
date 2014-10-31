@@ -43,26 +43,32 @@ import fr.paris.lutece.portal.service.security.LuteceUser;
 public class OpenamUser extends LuteceUser
 {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public String ROLE_VERIFIED = "verified";
-
+         *
+         */
+    private static final long serialVersionUID = 1L;
+    public String ROLE_VERIFIED = "verified";
     private String _strSubjectId;
+
+    /**
+     * Constructor
+     * @param strUserName The user's name
+     * @param authenticationService The authentication service that authenticates the user
+     */
+    public OpenamUser( String strUserName, LuteceAuthentication authenticationService )
+    {
+        super( strUserName, authenticationService );
+    }
 
     /**
     * Constructor
     * @param strUserName The user's name
     * @param authenticationService The authentication service that authenticates the user
     */
-    public OpenamUser( String strUserName, LuteceAuthentication authenticationService,String strSubjectId )
+    public OpenamUser( String strUserName, LuteceAuthentication authenticationService, String strSubjectId )
     {
         super( strUserName, authenticationService );
-        _strSubjectId=strSubjectId;
+        _strSubjectId = strSubjectId;
     }
-
-    
 
     /**
      *
@@ -81,7 +87,7 @@ public class OpenamUser extends LuteceUser
     {
         this._strSubjectId = strSubjectId;
     }
-    
+
     /**
      * Returns the Email
      *
@@ -90,6 +96,6 @@ public class OpenamUser extends LuteceUser
     @Override
     public String getEmail(  )
     {
-        return  getUserInfo(LuteceUser.HOME_INFO_ONLINE_EMAIL);
+        return getUserInfo( LuteceUser.HOME_INFO_ONLINE_EMAIL );
     }
 }

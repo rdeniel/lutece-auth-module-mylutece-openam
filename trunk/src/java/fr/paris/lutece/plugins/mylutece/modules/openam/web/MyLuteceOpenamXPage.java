@@ -33,9 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-
 import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
@@ -46,6 +43,10 @@ import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
 import fr.paris.lutece.util.json.AbstractJsonResponse;
 import fr.paris.lutece.util.json.JsonResponse;
 import fr.paris.lutece.util.json.JsonUtil;
+
+import javax.security.auth.login.LoginException;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**

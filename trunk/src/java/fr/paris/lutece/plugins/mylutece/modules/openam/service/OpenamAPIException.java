@@ -40,18 +40,18 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 public class OpenamAPIException extends Exception
 {
     /**
-	 * 
-	 */
+         *
+         */
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -2375566306839951530L;
-
-	/**
-     * The constructor
-     * @param strMessage The Message
+    /**
+     *
      */
+    private static final long serialVersionUID = -2375566306839951530L;
+
+    /**
+    * The constructor
+    * @param strMessage The Message
+    */
     public OpenamAPIException( String strMessage )
     {
         super( strMessage );

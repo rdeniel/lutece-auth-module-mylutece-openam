@@ -51,6 +51,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * ParisConnectLuteceFilters
@@ -95,10 +97,10 @@ public class OpenamLuteceFilter implements Filter
             String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
 
             //if the request does not contains the Paris connect connection cookie 
-            if ( ( strConnexionCookie == null ) || ( strConnexionCookie != ( (OpenamUser) user ).getSubjectId()) )
+            if ( (!StringUtils.isEmpty(((OpenamUser) user).getSubjectId() )) && (strConnexionCookie == null  || ( strConnexionCookie != ( (OpenamUser) user ).getSubjectId(  ) )) )
             {
                 OpenamService.getInstance(  )
-                                   .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
+                             .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
                     (HttpServletResponse) response );
             }
         }

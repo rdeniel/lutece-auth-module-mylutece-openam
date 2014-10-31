@@ -45,6 +45,7 @@ import net.sf.json.JSONSerializer;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -184,8 +185,7 @@ public class OpenamAPI
     {
         return callMethod( strMethod, mapParameters, null );
     }
-    
-    
+
     /**
      * Call a Method of the API
      * @param strMethod The method name
@@ -197,10 +197,8 @@ public class OpenamAPI
     public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders )
         throws OpenamAPIException
     {
-        return callMethod( strMethod, mapParameters,mapHeaders, true );
+        return callMethod( strMethod, mapParameters, mapHeaders, true );
     }
-
-    
 
     /**
      * Call a Method of the API
@@ -210,25 +208,24 @@ public class OpenamAPI
      * @return The string returned by the API
      * @throws OpenamAPIException if an error occurs
      */
-    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders, boolean bJSON )
-        throws OpenamAPIException
+    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
+        boolean bJSON ) throws OpenamAPIException
     {
         HttpAccess httpAccess = new HttpAccess(  );
         UrlItem url = new UrlItem( _strUrl + strMethod );
-//        if(mapParameters!=null)
-//        {
-//        	 mapParameters.put( PARAMETER_API_ID, _strApiId );
-//             mapParameters.put( PARAMETER_SECRET_KEY, _strSecretKey );
-//
-//        }
-        
-       
-	     String strResponse = "";
+
+        //        if(mapParameters!=null)
+        //        {
+        //        	 mapParameters.put( PARAMETER_API_ID, _strApiId );
+        //             mapParameters.put( PARAMETER_SECRET_KEY, _strSecretKey );
+        //
+        //        }
+        String strResponse = "";
 
         try
         {
-            
-        	strResponse=httpAccess.doPost(url.getUrl(  ), mapParameters, null, null, mapHeaders);
+            strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
+
             if ( _bDebug )
             {
                 _logger.debug( "API call : " + getCallUrl( url.getUrl(  ), mapParameters ) );
@@ -239,7 +236,7 @@ public class OpenamAPI
             _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
         }
 
-        if ( !StringUtils.isEmpty(strResponse) )
+        if ( !StringUtils.isEmpty( strResponse ) )
         {
             boolean bJSONArray = strResponse.startsWith( "[{" );
 
@@ -300,21 +297,20 @@ public class OpenamAPI
     private String getCallUrl( String strUrl, Map<String, String> mapParameters )
     {
         UrlItem url = new UrlItem( strUrl );
-        
-        
-        if( mapParameters !=null)
+
+        if ( mapParameters != null )
         {
-	        for ( Entry<String, String> entry : mapParameters.entrySet(  ) )
-	        {
-	            if ( entry.getKey(  ).equals( PARAMETER_SECRET_KEY ) )
-	            {
-	                url.addParameter( entry.getKey(  ), "************" );
-	            }
-	            else
-	            {
-	                url.addParameter( entry.getKey(  ), entry.getValue(  ) );
-	            }
-	        }
+            for ( Entry<String, String> entry : mapParameters.entrySet(  ) )
+            {
+                if ( entry.getKey(  ).equals( PARAMETER_SECRET_KEY ) )
+                {
+                    url.addParameter( entry.getKey(  ), "************" );
+                }
+                else
+                {
+                    url.addParameter( entry.getKey(  ), entry.getValue(  ) );
+                }
+            }
         }
 
         return url.getUrl(  );
