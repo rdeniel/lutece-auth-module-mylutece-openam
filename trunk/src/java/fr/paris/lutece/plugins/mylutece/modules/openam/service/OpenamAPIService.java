@@ -33,20 +33,17 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppLogService;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import org.apache.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-
-import java.util.HashMap;
-import java.util.Map;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
@@ -81,8 +78,10 @@ public final class OpenamAPIService
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_CONTENT_TYPE_JSON_VALUE = "application/json";
     private static final OpenamAPI _authenticateAPI = SpringContextService.getBean( "mylutece-openam.apiAuthenticate" );
-    private static final OpenamAPI _identityAPI = SpringContextService.getBean( "mylutece-openam.apiIdentity" );
+    //private static final OpenamAPI _identityAPI = SpringContextService.getBean( "mylutece-openam.apiIdentity" );
     private static final OpenamAPI _sessionAPI = SpringContextService.getBean( "mylutece-openam.apiSession" );
+    private static final OpenamAPI _usersAPI = SpringContextService.getBean( "mylutece-openam.apiUsers" );
+    
     private static Logger _logger = org.apache.log4j.Logger.getLogger( Constants.LOGGER_OPENAM );
 
     /** Private constructor */
@@ -96,7 +95,7 @@ public final class OpenamAPIService
      * @param strUserPassword The User's password
      * @return The response provided by the API in JSON format
      */
-    static String doLogin( String strUserName, String strUserPassword )
+  public  static String doLogin( String strUserName, String strUserPassword )
         throws OpenamAPIException
     {
         String strResponse = null;
@@ -109,7 +108,7 @@ public final class OpenamAPIService
 
         try
         {
-            strResponse = _authenticateAPI.callMethod( "?realm=paris", null, headerParameters, true );
+            strResponse = _authenticateAPI.callMethod( "", null, headerParameters, true );
 
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
             if(jo.containsKey(KEY_TOKEN_ID))
@@ -128,64 +127,70 @@ public final class OpenamAPIService
 
     
     
-    /**
-     * Checks the connection cookie
-     * @param strSubjectId The 'account' cookie value
-     * @return The UID if the cookie is valid otherwyse false
-     */
-    @Deprecated
-    static boolean isValidateOld( String strSubjectId )
-        throws OpenamAPIException
-    {
-    	
-    	
-    	Map<String, String> mapParameters = new HashMap<String, String>(  );
-    	mapParameters.put("tokenid", strSubjectId);
-        
-    	Map<String, String> headerParameters = new HashMap<String, String>(  );
-    	    
-	   
-          
-        try
-        {
-        	String strResponse = _identityAPI.callMethod("isTokenValid" , mapParameters,headerParameters, false );
-            
-         	if(strResponse.trim().equals("boolean=true"))
-        	{
-        		return true;
-        	}
-        }
-        catch ( OpenamAPIException ex )
-        {
-        	_logger.error(ex); 
-        } 
-        return false;
-    }
+//    /**
+//     * Checks the connection cookie
+//     * @param strSubjectId The 'account' cookie value
+//     * @return The UID if the cookie is valid otherwyse false
+//     */
+//    @Deprecated
+//    static boolean isValidateOld( String strSubjectId )
+//        throws OpenamAPIException
+//    {
+//    	
+//    	
+//    	Map<String, String> mapParameters = new HashMap<String, String>(  );
+//    	mapParameters.put("tokenid", strSubjectId);
+//        
+//    	Map<String, String> headerParameters = new HashMap<String, String>(  );
+//    	    
+//	   
+//          
+//        try
+//        {
+//        	String strResponse = _identityAPI.callMethod("isTokenValid" , mapParameters,headerParameters, false );
+//            
+//         	if(strResponse.trim().equals("boolean=true"))
+//        	{
+//        		return true;
+//        	}
+//        }
+//        catch ( OpenamAPIException ex )
+//        {
+//        	_logger.error(ex); 
+//        } 
+//        return false;
+//    }
     
     /**
      * Checks the connection cookie
      * @param strSubjectId The 'account' cookie value
      * @return The UID if the cookie is valid otherwyse false
      */
-    static boolean isValidate( String strSubjectId ) throws OpenamAPIException
+  public  static String isValidate( String strSubjectId ) throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
         try
         {
-            String strResponse = _sessionAPI.callMethod( strSubjectId + "?action=validate", null, headerParameters, true );
+            String strResponse = _sessionAPI.callMethod( strSubjectId + "?_action=validate", null, headerParameters, true );
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
+            
+            
             String strValidResponse = jo.getString( KEY_VALID );
 
-            return new Boolean( strValidResponse );
+            if( new Boolean( strValidResponse ))
+            {
+            	return jo.getString(KEY_UID);
+            }
+            
         }
         catch ( OpenamAPIException ex )
         {
             _logger.error( ex );
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -194,17 +199,20 @@ public final class OpenamAPIService
      * @return The response provided by the API in JSON format
      */
     
-    static String doDisconnect( String strSubjectId ) throws OpenamAPIException
+  public static String doDisconnect( String strSubjectId ) throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
         //headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
         headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
+        headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
+
 
         String strResult = null;
 
         try
         {
-            String strResponse = _sessionAPI.callMethod( "?action=logout", null, headerParameters, true );
+            String strResponse = _sessionAPI.callMethod( "?_action=logout", null, headerParameters, true );
+
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
             if(jo.containsKey(KEY_RESULT))
             {
@@ -220,92 +228,140 @@ public final class OpenamAPIService
     }
     
     
-    /**
-     * Process user logout
-     * @param strPCUID the user PCUID
-     * @return The response provided by the API in JSON format
-     */
-    @Deprecated
-    static String doDisconnectOld( String strSubjectId ) throws OpenamAPIException
-    {
-       
-    	Map<String, String> headerParameters = new HashMap<String, String>(  );
-    	Map<String, String> mapParameters = new HashMap<String, String>(  );
-        //headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
-        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
+//    /**
+//     * Process user logout
+//     * @param strPCUID the user PCUID
+//     * @return The response provided by the API in JSON format
+//     */
+//    @Deprecated
+//    static String doDisconnectOld( String strSubjectId ) throws OpenamAPIException
+//    {
+//       
+//    	Map<String, String> headerParameters = new HashMap<String, String>(  );
+//    	Map<String, String> mapParameters = new HashMap<String, String>(  );
+//        //headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
+//        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
+//
+//        String strResult = null;
+//
+//        try
+//        {
+//            String strResponse = _identityAPI.callMethod( "logout", mapParameters, headerParameters, false );
+//            
+//        }
+//        catch ( OpenamAPIException ex )
+//        {
+//            _logger.error( ex );
+//        }
+//
+//        return strResult;
+//    }
 
-        String strResult = null;
-
-        try
-        {
-            String strResponse = _identityAPI.callMethod( "logout", mapParameters, headerParameters, false );
-            
-        }
-        catch ( OpenamAPIException ex )
-        {
-            _logger.error( ex );
-        }
-
-        return strResult;
-    }
-
+//    /**
+//     * Get user infos
+//     * @param strPCUID The UserID
+//     * @return The response provided by the API in JSON format
+//     */
+//    static Map<String, String> getUserInformationsOld( String strSubjectId )
+//        throws OpenamAPIException
+//    {
+//        Map<String, String> mapParameters = new HashMap<String, String>(  );
+//        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
+//
+//        try
+//        {
+//            String strResponse = _identityAPI.callMethod( METHOD_GET_ATTRIBUTES, mapParameters, null, false );
+//
+//            if ( strResponse != null )
+//            {
+//                String strThisLine;
+//                String strAttributeName;
+//                String strAttributeValue;
+//
+//                BufferedReader strBf = new BufferedReader( new StringReader( strResponse ) );
+//
+//                try
+//                {
+//                    while ( ( strThisLine = strBf.readLine(  ) ) != null )
+//                    {
+//                        if ( strThisLine.contains( USER_ATTRINUTE_NAME ) )
+//                        {
+//                            strAttributeName = strThisLine.substring( USER_ATTRINUTE_NAME.length(  ) + 1 );
+//                            strThisLine = strBf.readLine(  );
+//
+//                            if ( strThisLine != null )
+//                            {
+//                                if ( strThisLine.contains( USER_ATTRINUTE_VALUE ) )
+//                                {
+//                                    strAttributeValue = strThisLine.substring( USER_ATTRINUTE_VALUE.length(  ) + 1 );
+//
+//                                    mapParameters.put( strAttributeName, strAttributeValue );
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                catch ( IOException e )
+//                {
+//                    AppLogService.error( e );
+//                }
+//            }
+//        }
+//        catch ( OpenamAPIException ex )
+//        {
+//            _logger.warn( "Metadata API call : attributes=" + strSubjectId + " - " + ex.getMessage(  ) );
+//
+//            return null;
+//        }
+//
+//        return mapParameters;
+//    }
+//    
+    
+    
     /**
      * Get user infos
      * @param strPCUID The UserID
      * @return The response provided by the API in JSON format
      */
-    static Map<String, String> getUserInformations( String strSubjectId )
+  public  static Map<String, String> getUserInformations( String strSubjectId ,String strUserId,Map<String, String> mapUserMapping,String strUserAttributeKey)
         throws OpenamAPIException
     {
-        Map<String, String> mapParameters = new HashMap<String, String>(  );
-        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
-
+        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
+        Map<String, String> mapInfos= new HashMap<String, String>(  );
         try
         {
-            String strResponse = _identityAPI.callMethod( METHOD_GET_ATTRIBUTES, mapParameters, null, false );
-
-            if ( strResponse != null )
+            String strResponse = _usersAPI.callMethod( strUserId, null,headerParameters, true, true );
+            JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
+            JSONArray joArray;
+            if ( jo.containsKey(strUserAttributeKey) )
             {
-                String strThisLine;
-                String strAttributeName;
-                String strAttributeValue;
-
-                BufferedReader strBf = new BufferedReader( new StringReader( strResponse ) );
-
-                try
+            	mapInfos.put(strUserAttributeKey, jo.getString(strUserAttributeKey));
+            }
+            
+          
+            	for ( Entry<String, String> entry : mapUserMapping.entrySet(  ) )
                 {
-                    while ( ( strThisLine = strBf.readLine(  ) ) != null )
+                    if ( jo.containsKey(entry.getKey()) )
                     {
-                        if ( strThisLine.contains( USER_ATTRINUTE_NAME ) )
-                        {
-                            strAttributeName = strThisLine.substring( USER_ATTRINUTE_NAME.length(  ) + 1 );
-                            strThisLine = strBf.readLine(  );
+                    	joArray=jo.getJSONArray(entry.getKey());
+                    	
+                    	for (int i = 0; i < joArray.size(); i++) {
+                    		mapInfos.put(entry.getKey(), joArray.getString(i));
+                    	}
 
-                            if ( strThisLine != null )
-                            {
-                                if ( strThisLine.contains( USER_ATTRINUTE_VALUE ) )
-                                {
-                                    strAttributeValue = strThisLine.substring( USER_ATTRINUTE_VALUE.length(  ) + 1 );
-
-                                    mapParameters.put( strAttributeName, strAttributeValue );
-                                }
-                            }
-                        }
                     }
                 }
-                catch ( IOException e )
-                {
-                    AppLogService.error( e );
-                }
-            }
         }
+                
         catch ( OpenamAPIException ex )
         {
-            _logger.warn( "Metadata API call : attributes=" + strSubjectId + " - " + ex.getMessage(  ) );
+            _logger.warn( "Metadata API call : users/" + strSubjectId + " - " + ex.getMessage(  ) );
 
             return null;
         }
 
-        return mapParameters;
+        return mapInfos;
     }
 }

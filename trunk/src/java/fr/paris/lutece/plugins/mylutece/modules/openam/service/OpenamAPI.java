@@ -199,7 +199,8 @@ public class OpenamAPI
     {
         return callMethod( strMethod, mapParameters, mapHeaders, true );
     }
-
+    
+    
     /**
      * Call a Method of the API
      * @param strMethod The method name
@@ -210,6 +211,20 @@ public class OpenamAPI
      */
     public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
         boolean bJSON ) throws OpenamAPIException
+    {
+        return callMethod(strMethod, mapParameters, mapHeaders, bJSON, false);
+    }
+
+    /**
+     * Call a Method of the API
+     * @param strMethod The method name
+     * @param mapParameters Parameters
+     * @param bJSON Is JSON output
+     * @return The string returned by the API
+     * @throws OpenamAPIException if an error occurs
+     */
+    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
+        boolean bJSON ,boolean bGet) throws OpenamAPIException
     {
         HttpAccess httpAccess = new HttpAccess(  );
         UrlItem url = new UrlItem( _strUrl + strMethod );
@@ -224,7 +239,14 @@ public class OpenamAPI
 
         try
         {
-            strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
+        	if(bGet)
+        	{
+        		strResponse = httpAccess.doGet( url.getUrl(  ),  null, null, mapHeaders );
+        	}
+        	else
+        	{
+        		strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
+        	}
 
             if ( _bDebug )
             {
@@ -249,7 +271,8 @@ public class OpenamAPI
 
         return strResponse;
     }
-
+    
+   
     /**
      * Ckecks JSON for errors
      * @param strResponse The response in JSON format

@@ -48,6 +48,21 @@
             <value>(your API secret key)</value>
         </property>
     </bean>
+    
+    <bean id="mylutece-openam.apiUsers" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPI">
+        <property name="name">
+            <value>users</value>
+        </property>
+        <property name="url">
+            <value>https://openam.example.com:8443/openam/json/users/</value>
+        </property>
+        <property name="apiId">
+            <value>(your API Id)</value>
+        </property>
+        <property name="secretKey">
+            <value>(your API secret key)</value>
+        </property>
+    </bean>
   
   
 </beans>
