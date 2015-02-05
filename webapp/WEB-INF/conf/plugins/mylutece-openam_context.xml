@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+    <bean id="mylutece-openam.authentication" class="fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication"/>
+
+    <bean id="mylutece-openam.apiAuthenticate" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPI">
+        <property name="name">
+            <value>authenticate</value>
+        </property>
+        <property name="url">
+            <value>https://openam.example.com:8443/openam/json/authenticate</value>
+        </property>
+        <property name="apiId">
+            <value>(your API Id)</value>
+        </property>
+        <property name="secretKey">
+            <value>(your API secret key)</value>
+        </property>
+    </bean>
+   
+    <bean id="mylutece-openam.apiIdentity" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPI">
+        <property name="name">
+            <value>identity</value>
+        </property>
+        <property name="url">
+            <value>https://openam.example.com:8443/openam/identity/</value>
+        </property>
+        <property name="apiId">
+            <value>(your API Id)</value>
+        </property>
+        <property name="secretKey">
+            <value>(your API secret key)</value>
+        </property>
+    </bean>
+    
+      <bean id="mylutece-openam.apiSession" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPI">
+        <property name="name">
+            <value>session</value>
+        </property>
+        <property name="url">
+            <value>https://openam.example.com:8443/openam/json/sessions/</value>
+        </property>
+        <property name="apiId">
+            <value>(your API Id)</value>
+        </property>
+        <property name="secretKey">
+            <value>(your API secret key)</value>
+        </property>
+    </bean>
+    
+    <bean id="mylutece-openam.apiUsers" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPI">
+        <property name="name">
+            <value>users</value>
+        </property>
+        <property name="url">
+            <value>https://openam.example.com:8443/openam/json/users/</value>
+        </property>
+        <property name="apiId">
+            <value>(your API Id)</value>
+        </property>
+        <property name="secretKey">
+            <value>(your API secret key)</value>
+        </property>
+    </bean>
+  
+  
+</beans>
