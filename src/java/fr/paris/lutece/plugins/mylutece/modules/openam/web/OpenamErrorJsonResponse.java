@@ -38,7 +38,7 @@ import fr.paris.lutece.util.json.ErrorJsonResponse;
 
 /**
  *
- * ParisConnectErrorJsonResponse
+ * OpenamErrorJsonResponse
  *
  */
 public class OpenamErrorJsonResponse extends ErrorJsonResponse

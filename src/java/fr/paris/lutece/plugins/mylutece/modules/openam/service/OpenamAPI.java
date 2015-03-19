@@ -33,34 +33,31 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.util.httpaccess.HttpAccess;
-import fr.paris.lutece.util.httpaccess.HttpAccessException;
-import fr.paris.lutece.util.url.UrlItem;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
-
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.Constants;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPIException;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.util.httpaccess.HttpAccess;
+import fr.paris.lutece.util.httpaccess.HttpAccessException;
+import fr.paris.lutece.util.url.UrlItem;
 
 
 /**
- * ParisConnectAPI
+ * OpenamAPI
  */
 public class OpenamAPI
 {
-    private static final String PARAMETER_API_ID = "api_id";
-    private static final String PARAMETER_SECRET_KEY = "secret_key";
-    private static final String PROPERTY_API_CALL_DEBUG = "mylutece-parisconnect.api.debug";
+    private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
     private static final String KEY_ERROR = "ERR";
     private static final String KEY_ERROR_MSG = "str";
     private static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
@@ -69,8 +66,6 @@ public class OpenamAPI
     // Variables declarations 
     private String _strName;
     private String _strUrl;
-    private String _strApiId;
-    private String _strSecretKey;
     private Map _map;
 
     /**
@@ -113,45 +108,7 @@ public class OpenamAPI
         _strUrl = strUrl;
     }
 
-    /**
-     * Returns the ApiId
-     *
-     * @return The ApiId
-     */
-    public String getApiId(  )
-    {
-        return _strApiId;
-    }
-
-    /**
-     * Sets the ApiId
-     *
-     * @param strApiId The ApiId
-     */
-    public void setApiId( String strApiId )
-    {
-        _strApiId = strApiId;
-    }
-
-    /**
-     * Returns the SecretKey
-     *
-     * @return The SecretKey
-     */
-    public String getSecretKey(  )
-    {
-        return _strSecretKey;
-    }
-
-    /**
-     * Sets the SecretKey
-     *
-     * @param strSecretKey The SecretKey
-     */
-    public void setSecretKey( String strSecretKey )
-    {
-        _strSecretKey = strSecretKey;
-    }
+   
 
     /**
      * Returns the Map
@@ -229,12 +186,7 @@ public class OpenamAPI
         HttpAccess httpAccess = new HttpAccess(  );
         UrlItem url = new UrlItem( _strUrl + strMethod );
 
-        //        if(mapParameters!=null)
-        //        {
-        //        	 mapParameters.put( PARAMETER_API_ID, _strApiId );
-        //             mapParameters.put( PARAMETER_SECRET_KEY, _strSecretKey );
-        //
-        //        }
+
         String strResponse = "";
 
         try
@@ -252,11 +204,7 @@ public class OpenamAPI
             {
                 _logger.debug( "API call : " + getCallUrl( url.getUrl(  ), mapParameters ) );
             }
-        }
-        catch ( HttpAccessException ex )
-        {
-            _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
-        }
+        
 
         if ( !StringUtils.isEmpty( strResponse ) )
         {
@@ -267,6 +215,11 @@ public class OpenamAPI
             {
                 checkJSONforErrors( strResponse );
             }
+        }
+        }
+        catch ( HttpAccessException ex )
+        {
+            _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
         }
 
         return strResponse;
@@ -325,14 +278,8 @@ public class OpenamAPI
         {
             for ( Entry<String, String> entry : mapParameters.entrySet(  ) )
             {
-                if ( entry.getKey(  ).equals( PARAMETER_SECRET_KEY ) )
-                {
-                    url.addParameter( entry.getKey(  ), "************" );
-                }
-                else
-                {
-                    url.addParameter( entry.getKey(  ), entry.getValue(  ) );
-                }
+                 url.addParameter( entry.getKey(  ), entry.getValue(  ) );
+                
             }
         }
 

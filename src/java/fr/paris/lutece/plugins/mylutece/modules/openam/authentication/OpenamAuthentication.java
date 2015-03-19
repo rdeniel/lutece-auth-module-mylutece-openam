@@ -33,38 +33,29 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.authentication;
 
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityTokenService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.login.LoginException;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * ParisConnect Authentication
+ * OpenamAuthentication Authentication
  */
 public class OpenamAuthentication extends PortalAuthentication
 {
-    private static final String TOKEN_ACTION_LOGIN = "dologin";
-    private static final String AUTH_SERVICE_NAME = "Lutece Paris Connect Authentication Service";
-    private static final String URL_ICON = "images/local/skin/plugins/mylutece/modules/parisconnect/parisconnect.png";
-    private static final String PROPERTY_CREATE_ACCOUNT_URL = "mylutece-parisconnect.url.createAccount.page";
-    private static final String PROPERTY_LOST_PASSWORD_URL = "mylutece-parisconnect.url.lostPassword.page";
-    private static final String PROPERTY_VIEW_ACCOUNT_URL = "mylutece-parisconnect.url.viewAccount.page";
-    private static final String PROPERTY_MESSAGE_FAILED_LOGIN = "module.mylutece.parisconnect.message.error.failedLogin";
+    private static final String AUTH_SERVICE_NAME = "Lutece Openam Authentication Service";
+    private static final String URL_ICON = "images/local/skin/plugins/mylutece/modules/openam/openam.png";
+    private static final String PROPERTY_CREATE_ACCOUNT_URL = "mylutece-openam.url.createAccount.page";
+    private static final String PROPERTY_LOST_PASSWORD_URL = "mylutece-openam.url.lostPassword.page";
+    private static final String PROPERTY_VIEW_ACCOUNT_URL = "mylutece-openam.url.viewAccount.page";
+    private static final String PROPERTY_MESSAGE_FAILED_LOGIN = "module.mylutece.openam.message.error.failedLogin";
 
     /** Lutece User Attributs */
 
@@ -109,13 +100,7 @@ public class OpenamAuthentication extends PortalAuthentication
     public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
         throws LoginException
     {
-        //test token 
-        //        if ( !SecurityTokenService.getInstance(  ).validate( request, TOKEN_ACTION_LOGIN ) )
-        //        {
-        //            AppLogService.error( "ParisConnectAuthentication: Token not validated" );
-        //            throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
-        //                    request.getLocale(  ) ) );
-        //        }
+  
         LuteceUser user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
 
         if ( user == null )
@@ -172,7 +157,7 @@ public class OpenamAuthentication extends PortalAuthentication
     }
 
     /**
-     * Returns a Lutece user object if the user is already authenticated by Paris Connect
+     * Returns a Lutece user object if the user is already authenticated by Openam
      * @param request The HTTP request
      * @return Returns A Lutece User or null if there no user authenticated
      */

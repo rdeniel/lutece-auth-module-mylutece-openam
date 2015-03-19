@@ -38,7 +38,7 @@ import fr.paris.lutece.portal.service.plugin.PluginDefaultImplementation;
 
 /**
  *
- * ParisConnectPlugin
+ * OpenamPlugin
  */
 public class OpenamPlugin extends PluginDefaultImplementation
 {

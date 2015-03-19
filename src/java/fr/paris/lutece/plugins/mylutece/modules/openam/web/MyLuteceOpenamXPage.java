@@ -50,27 +50,23 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * MyLuteceParisConnectXPage
+ * MyLuteceOpenamXPage
  *
  */
-@Controller( xpageName = MyLuteceOpenamXPage.PAGE_MYLUTECE_PARIS_CONNECT, pageTitleI18nKey = "module.mylutece.parisconnect.xpage.myluteceParisConnect.pageTitle", pagePathI18nKey = "module.mylutece.parisconnect.xpage.myluteceParisConnect.pagePathLabel" )
+@Controller( xpageName = MyLuteceOpenamXPage.PAGE_MYLUTECE_OPENAM, pageTitleI18nKey = "module.mylutece.openam.xpage.myluteceOpenam.pageTitle", pagePathI18nKey = "module.mylutece.openam.xpage.myluteceOpenam.pagePathLabel" )
 public class MyLuteceOpenamXPage extends MVCApplication
 {
     /**
      * Name of this application
      */
-    public static final String PAGE_MYLUTECE_PARIS_CONNECT = "myluteceParisConnect";
+    public static final String PAGE_MYLUTECE_OPENAM = "myluteceOpenam";
     private static final long serialVersionUID = -4316691400124512414L;
 
     //Parameters
     private static final String PARAMETER_USERNAME = "username";
     private static final String PARAMETER_PASSWORD = "password";
 
-    // Views
-    private static final String VIEW_IS_USER_AUTHENTICATED = "isUserAuthenticatedJson";
-
     // Actions
-    private static final String ACTION_DO_LOGIN_JSON = "doLoginJson";
     private static final String TOKEN_ACTION_LOGIN = "dologin";
 
     // Json ERROR CODE

@@ -7,7 +7,7 @@
    <installation/>
    <changes/>
    <user-guide/>
-   <provider>module.mylutece.parisconnect.module.provider</provider>
+   <provider>module.mylutece.openam.module.provider</provider>
    <provider-url>http://lutece.paris.fr</provider-url>
    <icon-url>images/admin/skin/plugins/mylutece/modules/openam/openam.png</icon-url>
    <copyright>Copyright 2001-2014 Mairie de Paris</copyright>

@@ -97,12 +97,12 @@ public class OpenamLuteceFilter implements Filter
             String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
 
             //if the request does not contains the Paris connect connection cookie 
-            if ( (!StringUtils.isEmpty(((OpenamUser) user).getSubjectId() )) && (strConnexionCookie == null  || ( strConnexionCookie != ( (OpenamUser) user ).getSubjectId(  ) )) )
+            if ( (!StringUtils.isEmpty(((OpenamUser) user).getSubjectId() )) && (strConnexionCookie == null  || ( !strConnexionCookie.equals(( (OpenamUser) user ).getSubjectId(  ) )) ))
             {
                 OpenamService.getInstance(  )
                              .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
                     (HttpServletResponse) response );
-            }
+            }	
         }
 
         chain.doFilter( servletRequest, response );

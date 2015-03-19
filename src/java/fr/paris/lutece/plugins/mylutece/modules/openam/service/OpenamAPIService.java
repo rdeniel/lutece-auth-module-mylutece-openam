@@ -47,7 +47,7 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
- * ParisConnect API Service
+ * OpenamAPIService
  */
 public final class OpenamAPIService
 {
@@ -56,21 +56,14 @@ public final class OpenamAPIService
     public static final String USER_UID = "uid";
     public static final String PCUID = "pcuid";
     public static final String MESSAGE = "message";
-    private static final String METHOD_DO_LOGIN = "do_login";
-    private static final String METHOD_TOKEN_ID = "tokenId";
-    private static final String METHOD_GET_ATTRIBUTES = "attributes";
-    public static final String PARAMETER_SUBJECT_ID = "subjectid";
+     public static final String PARAMETER_SUBJECT_ID = "subjectid";
     public static final String PARAMETER_ID_ALERTES = "idalertes";
     public static final String PARAMETER_ID_EMAIL = "id_mail";
     private static final String KEY_TOKEN_ID = "tokenId";
-    private static final String KEY_AUTH_ID = "authId";
     private static final String KEY_VALID = "valid";
     private static final String KEY_UID = "uid";
-    private static final String KEY_REALM = "realm";
     private static final String KEY_RESULT = "result";
-    private static final String KEY_IS_VERIFIED = "is_verified";
-    private static final String KEY_MESSAGE = "message";
-
+ 
     //HEADERS
     private static final String HEADER_EMAIL = "X-OpenAM-Username";
     private static final String HEADER_PASSWORD = "X-OpenAM-Password";
@@ -78,8 +71,7 @@ public final class OpenamAPIService
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_CONTENT_TYPE_JSON_VALUE = "application/json";
     private static final OpenamAPI _authenticateAPI = SpringContextService.getBean( "mylutece-openam.apiAuthenticate" );
-    //private static final OpenamAPI _identityAPI = SpringContextService.getBean( "mylutece-openam.apiIdentity" );
-    private static final OpenamAPI _sessionAPI = SpringContextService.getBean( "mylutece-openam.apiSession" );
+   private static final OpenamAPI _sessionAPI = SpringContextService.getBean( "mylutece-openam.apiSession" );
     private static final OpenamAPI _usersAPI = SpringContextService.getBean( "mylutece-openam.apiUsers" );
     
     private static Logger _logger = org.apache.log4j.Logger.getLogger( Constants.LOGGER_OPENAM );
@@ -127,39 +119,7 @@ public final class OpenamAPIService
 
     
     
-//    /**
-//     * Checks the connection cookie
-//     * @param strSubjectId The 'account' cookie value
-//     * @return The UID if the cookie is valid otherwyse false
-//     */
-//    @Deprecated
-//    static boolean isValidateOld( String strSubjectId )
-//        throws OpenamAPIException
-//    {
-//    	
-//    	
-//    	Map<String, String> mapParameters = new HashMap<String, String>(  );
-//    	mapParameters.put("tokenid", strSubjectId);
-//        
-//    	Map<String, String> headerParameters = new HashMap<String, String>(  );
-//    	    
-//	   
-//          
-//        try
-//        {
-//        	String strResponse = _identityAPI.callMethod("isTokenValid" , mapParameters,headerParameters, false );
-//            
-//         	if(strResponse.trim().equals("boolean=true"))
-//        	{
-//        		return true;
-//        	}
-//        }
-//        catch ( OpenamAPIException ex )
-//        {
-//        	_logger.error(ex); 
-//        } 
-//        return false;
-//    }
+
     
     /**
      * Checks the connection cookie
@@ -202,7 +162,6 @@ public final class OpenamAPIService
   public static String doDisconnect( String strSubjectId ) throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
-        //headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
         headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
@@ -228,96 +187,7 @@ public final class OpenamAPIService
     }
     
     
-//    /**
-//     * Process user logout
-//     * @param strPCUID the user PCUID
-//     * @return The response provided by the API in JSON format
-//     */
-//    @Deprecated
-//    static String doDisconnectOld( String strSubjectId ) throws OpenamAPIException
-//    {
-//       
-//    	Map<String, String> headerParameters = new HashMap<String, String>(  );
-//    	Map<String, String> mapParameters = new HashMap<String, String>(  );
-//        //headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
-//        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
-//
-//        String strResult = null;
-//
-//        try
-//        {
-//            String strResponse = _identityAPI.callMethod( "logout", mapParameters, headerParameters, false );
-//            
-//        }
-//        catch ( OpenamAPIException ex )
-//        {
-//            _logger.error( ex );
-//        }
-//
-//        return strResult;
-//    }
 
-//    /**
-//     * Get user infos
-//     * @param strPCUID The UserID
-//     * @return The response provided by the API in JSON format
-//     */
-//    static Map<String, String> getUserInformationsOld( String strSubjectId )
-//        throws OpenamAPIException
-//    {
-//        Map<String, String> mapParameters = new HashMap<String, String>(  );
-//        mapParameters.put( PARAMETER_SUBJECT_ID, strSubjectId );
-//
-//        try
-//        {
-//            String strResponse = _identityAPI.callMethod( METHOD_GET_ATTRIBUTES, mapParameters, null, false );
-//
-//            if ( strResponse != null )
-//            {
-//                String strThisLine;
-//                String strAttributeName;
-//                String strAttributeValue;
-//
-//                BufferedReader strBf = new BufferedReader( new StringReader( strResponse ) );
-//
-//                try
-//                {
-//                    while ( ( strThisLine = strBf.readLine(  ) ) != null )
-//                    {
-//                        if ( strThisLine.contains( USER_ATTRINUTE_NAME ) )
-//                        {
-//                            strAttributeName = strThisLine.substring( USER_ATTRINUTE_NAME.length(  ) + 1 );
-//                            strThisLine = strBf.readLine(  );
-//
-//                            if ( strThisLine != null )
-//                            {
-//                                if ( strThisLine.contains( USER_ATTRINUTE_VALUE ) )
-//                                {
-//                                    strAttributeValue = strThisLine.substring( USER_ATTRINUTE_VALUE.length(  ) + 1 );
-//
-//                                    mapParameters.put( strAttributeName, strAttributeValue );
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                catch ( IOException e )
-//                {
-//                    AppLogService.error( e );
-//                }
-//            }
-//        }
-//        catch ( OpenamAPIException ex )
-//        {
-//            _logger.warn( "Metadata API call : attributes=" + strSubjectId + " - " + ex.getMessage(  ) );
-//
-//            return null;
-//        }
-//
-//        return mapParameters;
-//    }
-//    
-    
     
     /**
      * Get user infos
@@ -337,7 +207,11 @@ public final class OpenamAPIService
             JSONArray joArray;
             if ( jo.containsKey(strUserAttributeKey) )
             {
-            	mapInfos.put(strUserAttributeKey, jo.getString(strUserAttributeKey));
+            	joArray=jo.getJSONArray(strUserAttributeKey);
+            	
+            	for (int i = 0; i < joArray.size(); i++) {
+            		mapInfos.put(strUserAttributeKey, joArray.getString(i));
+            	}
             }
             
           

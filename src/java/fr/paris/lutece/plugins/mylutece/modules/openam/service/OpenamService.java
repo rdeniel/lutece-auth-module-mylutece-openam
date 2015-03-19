@@ -33,18 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.log4j.Logger;
-
-import org.apache.lucene.queryparser.xml.builders.UserInputQueryBuilder;
-
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,10 +42,22 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+
+import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
+import fr.paris.lutece.portal.service.security.ILuteceUserProviderService;
+import fr.paris.lutece.portal.service.security.LuteceUserCacheService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
 
 /**
  *
- * ParisConnectService
+ * OpenamService
  */
 public final class OpenamService
 {
@@ -66,12 +66,14 @@ public final class OpenamService
     private static final String AUTHENTICATION_BEAN_NAME = "mylutece-openam.authentication";
     private static boolean _bAgentEnable;
     private static OpenamService _singleton;
+   
     private static final String PROPERTY_AGENT_ENABLE = "mylutece-openam.agentEnable";
-    private static final String PROPERTY_COOKIE_PARIS_CONNECT_NAME = "mylutece-openam.cookieName";
-    private static final String PROPERTY_COOKIE_PARIS_CONNECT_DOMAIN = "parisconnect.cookieDomain";
-    private static final String PROPERTY_COOKIE_PARIS_CONNECT_PATH = "mylutece-openam.cookiePath";
-    private static final String PROPERTY_COOKIE_PARIS_CONNECT_MAX_AGE = "mylutece-openam.cookieMaxAge";
-    private static final String PROPERTY_COOKIE_PARIS_CONNECT_MAX_SECURE = "mylutece-openam.cookieSecure";
+    private static final String PROPERTY_COOKIE_OPENAM_NAME = "mylutece-openam.cookieName";
+    private static final String PROPERTY_COOKIE_OPENAM_DOMAIN = "mylutece-openam.cookieDomain";
+    private static final String PROPERTY_COOKIE_OPENAM_PATH = "mylutece-openam.cookiePath";
+    private static final String PROPERTY_COOKIE_OPENAM_MAX_AGE = "mylutece-openam.cookieMaxAge";
+    private static final String PROPERTY_COOKIE_OPENAM_MAX_SECURE = "mylutece-openam.cookieSecure";
+    
     public static final String PROPERTY_USER_KEY_NAME = "mylutece-openam.attributeKeyUsername";
     public static final String PROPERTY_USER_MAPPING_ATTRIBUTES = "mylutece-openam.userMappingAttributes";
     public static final String CONSTANT_LUTECE_USER_PROPERTIES_PATH = "mylutece-openam.attribute";
@@ -103,11 +105,11 @@ public final class OpenamService
         if ( _singleton == null )
         {
             _singleton = new OpenamService(  );
-            COOKIE_OPENAM_NAME = AppPropertiesService.getProperty( PROPERTY_COOKIE_PARIS_CONNECT_NAME );
-            COOKIE_OPENAM_DOMAIN = AppPropertiesService.getProperty( PROPERTY_COOKIE_PARIS_CONNECT_DOMAIN );
-            COOKIE_OPENAM_PATH = AppPropertiesService.getProperty( PROPERTY_COOKIE_PARIS_CONNECT_PATH );
-            COOKIE_OPENAM_MAX_AGE = AppPropertiesService.getPropertyInt( PROPERTY_COOKIE_PARIS_CONNECT_MAX_AGE, 60 * 30 );
-            COOKIE_OPENAM_SECURE = AppPropertiesService.getPropertyBoolean( PROPERTY_COOKIE_PARIS_CONNECT_MAX_SECURE,
+            COOKIE_OPENAM_NAME = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_NAME );
+            COOKIE_OPENAM_DOMAIN = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_DOMAIN );
+            COOKIE_OPENAM_PATH = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_PATH );
+            COOKIE_OPENAM_MAX_AGE = AppPropertiesService.getPropertyInt( PROPERTY_COOKIE_OPENAM_MAX_AGE, 60 * 30 );
+            COOKIE_OPENAM_SECURE = AppPropertiesService.getPropertyBoolean( PROPERTY_COOKIE_OPENAM_MAX_SECURE,
                     true );
 
             ATTRIBUTE_USER_KEY_NAME = AppPropertiesService.getProperty( PROPERTY_USER_KEY_NAME );
@@ -153,7 +155,7 @@ public final class OpenamService
         else
         {
             _logger.error( 
-                "ParisConnectAuthentication not found, please check your parisconnect_context.xml configuration" );
+                "OpenamAuthentication not found, please check your openam_context.xml configuration" );
         }
     }
 
@@ -166,12 +168,12 @@ public final class OpenamService
      *            The user's name
      * @param strUserPassword
      *            The user's password
-     * @param parisConnectAuthentication
+     * @param openamAuthentication
      *            The authentication
      * @return The LuteceUser
      */
     public OpenamUser doLogin( HttpServletRequest request, String strUserName, String strUserPassword,
-        OpenamAuthentication parisConnectAuthentication )
+        OpenamAuthentication openamAuthentication )
     {
         String strTokenId;
         OpenamUser user = null;
@@ -186,7 +188,7 @@ public final class OpenamService
         if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
                 headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
         {
-            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), parisConnectAuthentication,getConnectionCookie(request) );
+            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,getConnectionCookie(request) );
             addUserAttributes( headerUserInformations, user );
         }
         else
@@ -203,11 +205,11 @@ public final class OpenamService
                     if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
                     {
                         user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ),
-                                parisConnectAuthentication, strTokenId );
+                                openamAuthentication, strTokenId );
                         addUserAttributes( userInformations, user );
                     }
                 }
-            }
+            }	
             catch ( OpenamAPIException ex )
             {
                 _logger.warn( ex.getMessage(  ) );
@@ -218,10 +220,10 @@ public final class OpenamService
     }
 
     /**
-     * Logout to paris connect
+     * Logout to openam
      *
      * @param user
-     *            the ParisConnectUser
+     *            the User
      */
     public void doLogout( OpenamUser user )
     {
@@ -240,12 +242,12 @@ public final class OpenamService
      *
      * @param request
      *            The HTTP request
-     * @param parisConnectAuthentication
+     * @param openamAuthentication
      *            The Authentication
      * @return The LuteceUser
      */
     public OpenamUser getHttpAuthenticatedUser( HttpServletRequest request,
-        OpenamAuthentication parisConnectAuthentication )
+        OpenamAuthentication openamAuthentication )
     {
         OpenamUser user = null;
         Map<String, String> headerUserInformations = null;
@@ -258,7 +260,7 @@ public final class OpenamService
         if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
                 headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
         {
-            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), parisConnectAuthentication,getConnectionCookie(request) );
+            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,getConnectionCookie(request) );
             addUserAttributes( headerUserInformations, user );
         }
         else
@@ -279,7 +281,7 @@ public final class OpenamService
                         if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
                         {
                             user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ),
-                                    parisConnectAuthentication, strTokenId );
+                                    openamAuthentication, strTokenId );
                             addUserAttributes( userInformations, user );
                         }
                     }
@@ -334,13 +336,13 @@ public final class OpenamService
     {
         // set a connexion cookie to let the user access other PC Services
         // without sign in
-        Cookie parisConnectCookie = new Cookie( COOKIE_OPENAM_NAME, strPCUID );
-        parisConnectCookie.setDomain( COOKIE_OPENAM_DOMAIN );
-        parisConnectCookie.setSecure( COOKIE_OPENAM_SECURE );
-        parisConnectCookie.setMaxAge( COOKIE_OPENAM_MAX_AGE );
-        parisConnectCookie.setPath( COOKIE_OPENAM_PATH );
+        Cookie openamCookie = new Cookie( COOKIE_OPENAM_NAME, strPCUID );
+        openamCookie.setDomain( COOKIE_OPENAM_DOMAIN );
+        openamCookie.setSecure( COOKIE_OPENAM_SECURE );
+        openamCookie.setMaxAge( COOKIE_OPENAM_MAX_AGE );
+        openamCookie.setPath( COOKIE_OPENAM_PATH );
 
-        response.addCookie( parisConnectCookie );
+        response.addCookie( openamCookie );
     }
 
     /**
@@ -360,6 +362,22 @@ public final class OpenamService
                 user.setUserInfo( ATTRIBUTE_USER_MAPPING.get( entry.getKey(  ) ), entry.getValue(  ) );
             }
         }
+        
+        Map<String, String> mapIdentitiesInformations;
+        //Add Identities Informations
+        mapIdentitiesInformations=getIdentityInformations(user.getName(), ATTRIBUTE_USER_MAPPING);
+        if(mapIdentitiesInformations!=null)
+        {
+        	 for ( Entry<String, String> entry : mapIdentitiesInformations.entrySet(  ) )
+             {
+                 if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
+                 {
+                     user.setUserInfo( ATTRIBUTE_USER_MAPPING.get( entry.getKey(  ) ), entry.getValue(  ) );
+                 }
+             }
+        	userInformations.putAll(mapIdentitiesInformations);
+        }
+        
     }
 
     /**
@@ -374,22 +392,29 @@ public final class OpenamService
     private Map<String, String> getUserInformationInHeaderRequest( HttpServletRequest request )
     {
     	
-    	System.out.println("************getUserInformationInHeaderRequest*******");
-        Map<String, String> userInformations = new HashMap<String, String>(  );
+    	Map<String, String> userInformations = new HashMap<String, String>(  );
         Enumeration headerNames = request.getHeaderNames(  );
 
         while ( headerNames.hasMoreElements(  ) )
         {
             String key = (String) headerNames.nextElement(  );
-            System.out.println("*******************"+key+"*******************");
-            System.out.println("*******************"+request.getHeader( key )+"*******************");
             if ( ATTRIBUTE_USER_MAPPING.containsKey( key ) || ATTRIBUTE_USER_KEY_NAME.equals(key))
             {
-            	System.out.println("*******************userInformations put*******************"+key+"-->"+request.getHeader( key ) );
                 userInformations.put( key, request.getHeader( key ) );
             }
         }
 
         return userInformations;
+    }
+    
+    
+    public Map<String,String> getIdentityInformations(String strName ,Map<String,String> attributeUserMapping)
+    {
+    	for ( IIdentityProviderService identityProviderService : SpringContextService.getBeansOfType( 
+	    		IIdentityProviderService.class ) )
+	    {
+    		return identityProviderService.getIdentityInformations(strName);
+	     }
+    	return null;
     }
 }
