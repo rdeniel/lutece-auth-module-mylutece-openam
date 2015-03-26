@@ -30,6 +30,7 @@
             <value>https://openam.example.com:8443/openam/json/users/</value>
         </property>
     </bean>
+   <bean id="mylutece-openam.openamLuteceUserSessionService" class="fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService"/>
   
   
 </beans>

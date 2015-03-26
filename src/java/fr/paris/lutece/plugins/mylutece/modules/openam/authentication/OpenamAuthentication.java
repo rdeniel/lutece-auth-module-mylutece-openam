@@ -38,6 +38,7 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
@@ -108,6 +109,8 @@ public class OpenamAuthentication extends PortalAuthentication
             throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
                     request.getLocale(  ) ) );
         }
+        //add Openam LuteceUser session
+        OpenamLuteceUserSessionService.getInstance().addLuteceUserSession(user.getName(), request.getSession(true).getId());
 
         return user;
     }
@@ -165,7 +168,12 @@ public class OpenamAuthentication extends PortalAuthentication
     public LuteceUser getHttpAuthenticatedUser( HttpServletRequest request )
     {
         OpenamUser user = OpenamService.getInstance(  ).getHttpAuthenticatedUser( request, this );
-
+        
+        if(user!=null)
+        {
+        	//add Openam LuteceUser session
+        	OpenamLuteceUserSessionService.getInstance().addLuteceUserSession(user.getName(), request.getSession(true).getId());
+        }
         return user;
     }
 

@@ -32,6 +32,20 @@
 				</url-pattern>
 		</filter>	
    </filters>
+      <filters>
+		<filter>
+				<filter-name>
+					OpenaAm Notify Lutece User
+				</filter-name>
+				<filter-class>
+					fr.paris.lutece.plugins.mylutece.modules.openam.web.NotifyLuteceUserFilter
+				</filter-class>
+				<url-pattern>
+					/plugins/openam/notifyLuteceUser
+				</url-pattern>
+		</filter>	
+   </filters>
+   
       <!-- XPages parameters -->
     <applications>
         <application>
@@ -44,5 +58,10 @@
         <javascript-files-scope>portal</javascript-files-scope>
         <javascript-file>mylutece/modules/openam/openam.js</javascript-file>
     </javascript-files>
+     	<listeners>
+		<listener>
+  	 			<listener-class>fr.paris.lutece.plugins.mylutece.modules.openam.listener.OpenamLuteceUserSessionListener</listener-class>
+		</listener>
+	</listeners>
    
 </plug-in>

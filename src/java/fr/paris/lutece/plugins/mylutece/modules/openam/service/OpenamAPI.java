@@ -60,8 +60,8 @@ public class OpenamAPI
     private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
     private static final String KEY_ERROR = "ERR";
     private static final String KEY_ERROR_MSG = "str";
-    private static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
-    private static boolean _bDebug = AppPropertiesService.getPropertyBoolean( PROPERTY_API_CALL_DEBUG, false );
+    public static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
+    public static boolean _bDebug = AppPropertiesService.getPropertyBoolean( PROPERTY_API_CALL_DEBUG, false );
 
     // Variables declarations 
     private String _strName;

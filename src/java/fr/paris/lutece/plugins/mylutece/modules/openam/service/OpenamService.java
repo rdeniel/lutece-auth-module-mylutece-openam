@@ -43,15 +43,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
-import fr.paris.lutece.portal.service.security.ILuteceUserProviderService;
-import fr.paris.lutece.portal.service.security.LuteceUserCacheService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 
@@ -85,8 +81,7 @@ public final class OpenamService
     private static final String SEPARATOR = ",";
     private static Map<String, String> ATTRIBUTE_USER_MAPPING;
     private static String ATTRIBUTE_USER_KEY_NAME;
-    private static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
-
+  
     /**
      * Empty constructor
      */
@@ -154,7 +149,7 @@ public final class OpenamService
         }
         else
         {
-            _logger.error( 
+            OpenamAPI._logger.error( 
                 "OpenamAuthentication not found, please check your openam_context.xml configuration" );
         }
     }
@@ -212,7 +207,7 @@ public final class OpenamService
             }	
             catch ( OpenamAPIException ex )
             {
-                _logger.warn( ex.getMessage(  ) );
+            	OpenamAPI._logger.warn( ex.getMessage(  ) );
             }
         }
 
@@ -233,7 +228,7 @@ public final class OpenamService
         }
         catch ( OpenamAPIException ex )
         {
-            _logger.warn( ex.getMessage(  ) );
+        	OpenamAPI._logger.warn( ex.getMessage(  ) );
         }
     }
 
@@ -288,7 +283,7 @@ public final class OpenamService
                 }
                 catch ( OpenamAPIException ex )
                 {
-                    _logger.warn( ex.getMessage(  ) );
+                	OpenamAPI._logger.warn( ex.getMessage(  ) );
                 }
             }
         }
@@ -315,7 +310,7 @@ public final class OpenamService
                 if ( cookie.getName(  ).equals( COOKIE_OPENAM_NAME ) )
                 {
                     strOpenamCookie = cookie.getValue(  );
-                    _logger.debug( "getHttpAuthenticatedUser : cookie '" + COOKIE_OPENAM_NAME + "' found - value=" +
+                    OpenamAPI._logger.debug( "getHttpAuthenticatedUser : cookie '" + COOKIE_OPENAM_NAME + "' found - value=" +
                         strOpenamCookie );
                 }
             }
@@ -394,14 +389,27 @@ public final class OpenamService
     	
     	Map<String, String> userInformations = new HashMap<String, String>(  );
         Enumeration headerNames = request.getHeaderNames(  );
-
+        
+        
+        String strKey;
         while ( headerNames.hasMoreElements(  ) )
         {
-            String key = (String) headerNames.nextElement(  );
-            if ( ATTRIBUTE_USER_MAPPING.containsKey( key ) || ATTRIBUTE_USER_KEY_NAME.equals(key))
+        	strKey = (String) headerNames.nextElement(  );
+            if ( ATTRIBUTE_USER_MAPPING.containsKey( strKey ) || ATTRIBUTE_USER_KEY_NAME.equals(strKey))
             {
-                userInformations.put( key, request.getHeader( key ) );
+                userInformations.put( strKey, request.getHeader( strKey ) );
             }
+        }
+        
+        if(OpenamAPI._bDebug)
+        {
+        	headerNames = request.getHeaderNames(  );
+        	OpenamAPI._logger.debug("Openam Headers Informations");
+        	while ( headerNames.hasMoreElements(  ) )
+            {
+        		strKey = (String) headerNames.nextElement(  );
+        		OpenamAPI._logger.debug(strKey +"="+request.getHeader( strKey ));
+        	}
         }
 
         return userInformations;

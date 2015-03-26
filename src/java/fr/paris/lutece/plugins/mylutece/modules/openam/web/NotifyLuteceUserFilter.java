@@ -46,21 +46,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
  * ParisConnectLuteceFilters
  *
  */
-public class OpenamLuteceFilter implements Filter
+public class NotifyLuteceUserFilter implements Filter
 {
+	
+	private final static  String PARAMETER_LUTECE_USER_NAME="lutece_user_name";
     /**
      *
      * {@inheritDoc}
@@ -76,38 +72,20 @@ public class OpenamLuteceFilter implements Filter
      * {@inheritDoc}
      */
     @Override
-    public void doFilter( ServletRequest servletRequest, ServletResponse response, FilterChain chain )
+    public void doFilter( ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain )
         throws IOException, ServletException
     {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        LuteceUser user = SecurityService.getInstance(  ).getRegisteredUser( request );
-
-        if ( user == null  || !OpenamLuteceUserSessionService.getInstance().isLuteceUserUpToDate(request.getSession(true).getId()))
-        {
-            OpenamAuthentication openamAuthentication = (OpenamAuthentication) SpringContextService.getBean( 
-                    "mylutece-openam.authentication" );
-            user = openamAuthentication.getHttpAuthenticatedUser( request );
-
-            if ( user != null )
-            {
-                SecurityService.getInstance(  ).registerUser( request, user );
-             }
-        }
-        else if(user instanceof OpenamUser)
-        {
-        	
-        	String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
-        	
-            //if the request does not contains the openam connection cookie 
-            if ( (!StringUtils.isEmpty(((OpenamUser) user).getSubjectId() )) && (strConnexionCookie == null  || ( !strConnexionCookie.equals(( (OpenamUser) user ).getSubjectId(  ) )) ))
-            {
-                OpenamService.getInstance(  )
-                             .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
-                    (HttpServletResponse) response );
-            }	
-        }
-
-        chain.doFilter( servletRequest, response );
+       HttpServletRequest request = (HttpServletRequest) servletRequest;
+       HttpServletResponse response = (HttpServletResponse) servletResponse;
+       
+       String strGuidParameter= request.getParameter( PARAMETER_LUTECE_USER_NAME );
+       if(!StringUtils.isEmpty( strGuidParameter))
+       {
+    	   OpenamLuteceUserSessionService.getInstance().notifyLuteceUserUpdating(strGuidParameter);
+       }
+       
+       response.setStatus(HttpServletResponse.SC_OK);
+    
     }
 
     /**
