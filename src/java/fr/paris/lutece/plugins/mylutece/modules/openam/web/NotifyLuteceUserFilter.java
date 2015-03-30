@@ -33,6 +33,10 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -44,10 +48,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
-
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
-
 
 /**
  * ParisConnectLuteceFilters
@@ -55,8 +55,8 @@ import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserS
  */
 public class NotifyLuteceUserFilter implements Filter
 {
-	
-	private final static  String PARAMETER_LUTECE_USER_NAME="lutece_user_name";
+    private final static String PARAMETER_LUTECE_USER_NAME = "lutece_user_name";
+
     /**
      *
      * {@inheritDoc}
@@ -75,17 +75,17 @@ public class NotifyLuteceUserFilter implements Filter
     public void doFilter( ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain )
         throws IOException, ServletException
     {
-       HttpServletRequest request = (HttpServletRequest) servletRequest;
-       HttpServletResponse response = (HttpServletResponse) servletResponse;
-       
-       String strGuidParameter= request.getParameter( PARAMETER_LUTECE_USER_NAME );
-       if(!StringUtils.isEmpty( strGuidParameter))
-       {
-    	   OpenamLuteceUserSessionService.getInstance().notifyLuteceUserUpdating(strGuidParameter);
-       }
-       
-       response.setStatus(HttpServletResponse.SC_OK);
-    
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        String strGuidParameter = request.getParameter( PARAMETER_LUTECE_USER_NAME );
+
+        if ( !StringUtils.isEmpty( strGuidParameter ) )
+        {
+            OpenamLuteceUserSessionService.getInstance(  ).notifyLuteceUserUpdating( strGuidParameter );
+        }
+
+        response.setStatus( HttpServletResponse.SC_OK );
     }
 
     /**

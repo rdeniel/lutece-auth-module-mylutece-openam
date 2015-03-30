@@ -39,8 +39,6 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.service;
  */
 public class OpenamAPIException extends Exception
 {
-   
-
     /**
      *
      */

@@ -33,6 +33,16 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
+import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import org.apache.commons.lang.StringUtils;
+
 import java.io.IOException;
 
 import javax.servlet.Filter;
@@ -43,16 +53,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
-import fr.paris.lutece.portal.service.security.LuteceUser;
-import fr.paris.lutece.portal.service.security.SecurityService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
@@ -82,7 +82,9 @@ public class OpenamLuteceFilter implements Filter
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         LuteceUser user = SecurityService.getInstance(  ).getRegisteredUser( request );
 
-        if ( user == null  || !OpenamLuteceUserSessionService.getInstance().isLuteceUserUpToDate(request.getSession(true).getId()))
+        if ( ( user == null ) ||
+                !OpenamLuteceUserSessionService.getInstance(  )
+                                                   .isLuteceUserUpToDate( request.getSession( true ).getId(  ) ) )
         {
             OpenamAuthentication openamAuthentication = (OpenamAuthentication) SpringContextService.getBean( 
                     "mylutece-openam.authentication" );
@@ -91,20 +93,21 @@ public class OpenamLuteceFilter implements Filter
             if ( user != null )
             {
                 SecurityService.getInstance(  ).registerUser( request, user );
-             }
+            }
         }
-        else if(user instanceof OpenamUser)
+        else if ( user instanceof OpenamUser )
         {
-        	
-        	String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
-        	
+            String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
+
             //if the request does not contains the openam connection cookie 
-            if ( (!StringUtils.isEmpty(((OpenamUser) user).getSubjectId() )) && (strConnexionCookie == null  || ( !strConnexionCookie.equals(( (OpenamUser) user ).getSubjectId(  ) )) ))
+            if ( ( !StringUtils.isEmpty( ( (OpenamUser) user ).getSubjectId(  ) ) ) &&
+                    ( ( strConnexionCookie == null ) ||
+                    ( !strConnexionCookie.equals( ( (OpenamUser) user ).getSubjectId(  ) ) ) ) )
             {
                 OpenamService.getInstance(  )
                              .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
                     (HttpServletResponse) response );
-            }	
+            }
         }
 
         chain.doFilter( servletRequest, response );

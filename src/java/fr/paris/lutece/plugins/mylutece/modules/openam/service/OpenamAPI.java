@@ -33,8 +33,10 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
+import fr.paris.lutece.util.httpaccess.HttpAccess;
+import fr.paris.lutece.util.httpaccess.HttpAccessException;
+import fr.paris.lutece.util.url.UrlItem;
 
 import net.sf.json.JSON;
 import net.sf.json.JSONException;
@@ -42,12 +44,11 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.log4j.Logger;
 
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.util.httpaccess.HttpAccess;
-import fr.paris.lutece.util.httpaccess.HttpAccessException;
-import fr.paris.lutece.util.url.UrlItem;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
@@ -55,7 +56,7 @@ import fr.paris.lutece.util.url.UrlItem;
  */
 public class OpenamAPI
 {
-	private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
+    private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
     private static final String KEY_ERROR_MSG = "str";
     public static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
     public static boolean _bDebug = AppPropertiesService.getPropertyBoolean( PROPERTY_API_CALL_DEBUG, false );
@@ -105,8 +106,6 @@ public class OpenamAPI
         _strUrl = strUrl;
     }
 
-   
-
     /**
      * Returns the Map
      *
@@ -153,8 +152,7 @@ public class OpenamAPI
     {
         return callMethod( strMethod, mapParameters, mapHeaders, true );
     }
-    
-    
+
     /**
      * Call a Method of the API
      * @param strMethod The method name
@@ -166,7 +164,7 @@ public class OpenamAPI
     public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
         boolean bJSON ) throws OpenamAPIException
     {
-        return callMethod(strMethod, mapParameters, mapHeaders, bJSON, false);
+        return callMethod( strMethod, mapParameters, mapHeaders, bJSON, false );
     }
 
     /**
@@ -178,85 +176,82 @@ public class OpenamAPI
      * @throws OpenamAPIException if an error occurs
      */
     public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
-        boolean bJSON ,boolean bGet) throws OpenamAPIException
+        boolean bJSON, boolean bGet ) throws OpenamAPIException
     {
         HttpAccess httpAccess = new HttpAccess(  );
         UrlItem url = new UrlItem( _strUrl + strMethod );
-
 
         String strResponse = "";
 
         try
         {
-        	if(bGet)
-        	{
-        		strResponse = httpAccess.doGet( url.getUrl(  ),  null, null, mapHeaders );
-        	}
-        	else
-        	{
-        		strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
-        	}
+            if ( bGet )
+            {
+                strResponse = httpAccess.doGet( url.getUrl(  ), null, null, mapHeaders );
+            }
+            else
+            {
+                strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
+            }
 
             if ( _bDebug )
             {
                 _logger.debug( "API call : " + getCallUrl( url.getUrl(  ), mapParameters ) );
             }
-        
 
-	//        if ( !StringUtils.isEmpty( strResponse ) )
-	//        {
-	//        	
-	//        	checkJSONforErrors( strResponse );
-	//           
-	//        }
+            //        if ( !StringUtils.isEmpty( strResponse ) )
+            //        {
+            //        	
+            //        	checkJSONforErrors( strResponse );
+            //           
+            //        }
         }
         catch ( HttpAccessException ex )
         {
             _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
-            throw new OpenamAPIException(ex.getResponseCode().toString());
+            throw new OpenamAPIException( ex.getResponseCode(  ).toString(  ) );
         }
 
         return strResponse;
     }
-    
-   
-//    /**
-//     * Ckecks JSON for errors
-//     * @param strResponse The response in JSON format
-//     * @throws OpenamAPIException if an error occurs
-//     */
-//    private void checkJSONforErrors( String strResponse )
-//        throws OpenamAPIException
-//    {
-//        JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
-//
-//        if ( joObject.containsKey( KEY_ERROR ) )
-//        {
-//            String strError = joObject.getString( KEY_ERROR );
-//            String strMessage;
-//
-//            // ERR value is not always a JSON object
-//            try
-//            {
-//                JSON joError = JSONSerializer.toJSON( strError );
-//
-//                if ( !joError.isArray(  ) )
-//                {
-//                    strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
-//                }
-//                else
-//                {
-//                    strMessage = joError.toString(  );
-//                }
-//            }
-//            catch ( JSONException e )
-//            {
-//                strMessage = strError;
-//            }
-//
-//            throw new OpenamAPIException( strMessage );
-//        }
-//    }
+
+    //    /**
+    //     * Ckecks JSON for errors
+    //     * @param strResponse The response in JSON format
+    //     * @throws OpenamAPIException if an error occurs
+    //     */
+    //    private void checkJSONforErrors( String strResponse )
+    //        throws OpenamAPIException
+    //    {
+    //        JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
+    //
+    //        if ( joObject.containsKey( KEY_ERROR ) )
+    //        {
+    //            String strError = joObject.getString( KEY_ERROR );
+    //            String strMessage;
+    //
+    //            // ERR value is not always a JSON object
+    //            try
+    //            {
+    //                JSON joError = JSONSerializer.toJSON( strError );
+    //
+    //                if ( !joError.isArray(  ) )
+    //                {
+    //                    strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
+    //                }
+    //                else
+    //                {
+    //                    strMessage = joError.toString(  );
+    //                }
+    //            }
+    //            catch ( JSONException e )
+    //            {
+    //                strMessage = strError;
+    //            }
+    //
+    //            throw new OpenamAPIException( strMessage );
+    //        }
+    //    }
 
     /**
      * Build the URL
@@ -272,8 +267,7 @@ public class OpenamAPI
         {
             for ( Entry<String, String> entry : mapParameters.entrySet(  ) )
             {
-                 url.addParameter( entry.getKey(  ), entry.getValue(  ) );
-                
+                url.addParameter( entry.getKey(  ), entry.getValue(  ) );
             }
         }
 
