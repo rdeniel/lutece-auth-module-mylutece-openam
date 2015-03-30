@@ -44,8 +44,6 @@ import net.sf.json.JSONSerializer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.Constants;
-import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAPIException;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.httpaccess.HttpAccess;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
@@ -57,8 +55,7 @@ import fr.paris.lutece.util.url.UrlItem;
  */
 public class OpenamAPI
 {
-    private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
-    private static final String KEY_ERROR = "ERR";
+	private static final String PROPERTY_API_CALL_DEBUG = "mylutece-openam.api.debug";
     private static final String KEY_ERROR_MSG = "str";
     public static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
     public static boolean _bDebug = AppPropertiesService.getPropertyBoolean( PROPERTY_API_CALL_DEBUG, false );
@@ -206,63 +203,60 @@ public class OpenamAPI
             }
         
 
-        if ( !StringUtils.isEmpty( strResponse ) )
-        {
-            boolean bJSONArray = strResponse.startsWith( "[{" );
-
-            // Responses are not always in JSON format and Array should not be checked for errors
-            if ( bJSON && !bJSONArray )
-            {
-                checkJSONforErrors( strResponse );
-            }
-        }
+	//        if ( !StringUtils.isEmpty( strResponse ) )
+	//        {
+	//        	
+	//        	checkJSONforErrors( strResponse );
+	//           
+	//        }
         }
         catch ( HttpAccessException ex )
         {
             _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
+            throw new OpenamAPIException(ex.getResponseCode().toString());
         }
 
         return strResponse;
     }
     
    
-    /**
-     * Ckecks JSON for errors
-     * @param strResponse The response in JSON format
-     * @throws OpenamAPIException if an error occurs
-     */
-    private void checkJSONforErrors( String strResponse )
-        throws OpenamAPIException
-    {
-        JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
-
-        if ( joObject.containsKey( KEY_ERROR ) )
-        {
-            String strError = joObject.getString( KEY_ERROR );
-            String strMessage;
-
-            // ERR value is not always a JSON object
-            try
-            {
-                JSON joError = JSONSerializer.toJSON( strError );
-
-                if ( !joError.isArray(  ) )
-                {
-                    strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
-                }
-                else
-                {
-                    strMessage = joError.toString(  );
-                }
-            }
-            catch ( JSONException e )
-            {
-                strMessage = strError;
-            }
-
-            throw new OpenamAPIException( strMessage );
-        }
-    }
+//    /**
+//     * Ckecks JSON for errors
+//     * @param strResponse The response in JSON format
+//     * @throws OpenamAPIException if an error occurs
+//     */
+//    private void checkJSONforErrors( String strResponse )
+//        throws OpenamAPIException
+//    {
+//        JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
+//
+//        if ( joObject.containsKey( KEY_ERROR ) )
+//        {
+//            String strError = joObject.getString( KEY_ERROR );
+//            String strMessage;
+//
+//            // ERR value is not always a JSON object
+//            try
+//            {
+//                JSON joError = JSONSerializer.toJSON( strError );
+//
+//                if ( !joError.isArray(  ) )
+//                {
+//                    strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
+//                }
+//                else
+//                {
+//                    strMessage = joError.toString(  );
+//                }
+//            }
+//            catch ( JSONException e )
+//            {
+//                strMessage = strError;
+//            }
+//
+//            throw new OpenamAPIException( strMessage );
+//        }
+//    }
 
     /**
      * Build the URL

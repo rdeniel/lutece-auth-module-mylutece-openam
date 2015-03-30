@@ -207,7 +207,7 @@ public final class OpenamService
             }	
             catch ( OpenamAPIException ex )
             {
-            	OpenamAPI._logger.warn( ex.getMessage(  ) );
+            	OpenamAPI._logger.error("Error During Login Openam"+ ex.getMessage(  ) );
             }
         }
 
@@ -228,7 +228,7 @@ public final class OpenamService
         }
         catch ( OpenamAPIException ex )
         {
-        	OpenamAPI._logger.warn( ex.getMessage(  ) );
+        	OpenamAPI._logger.error("Error During Logout Openam"+ ex.getMessage(  ) );
         }
     }
 
@@ -283,7 +283,7 @@ public final class OpenamService
                 }
                 catch ( OpenamAPIException ex )
                 {
-                	OpenamAPI._logger.warn( ex.getMessage(  ) );
+                	OpenamAPI._logger.error("Error getting Openam user Informations"+ ex.getMessage(  ) );
                 }
             }
         }

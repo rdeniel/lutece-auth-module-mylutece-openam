@@ -56,13 +56,17 @@ public final class OpenamAPIService
     public static final String USER_UID = "uid";
     public static final String PCUID = "pcuid";
     public static final String MESSAGE = "message";
-     public static final String PARAMETER_SUBJECT_ID = "subjectid";
+    public static final String PARAMETER_SUBJECT_ID = "subjectid";
     public static final String PARAMETER_ID_ALERTES = "idalertes";
     public static final String PARAMETER_ID_EMAIL = "id_mail";
+    public static final String ERROR_TECHNICAL = "TECHNICAL_ERROR";
+	
+   
     private static final String KEY_TOKEN_ID = "tokenId";
     private static final String KEY_VALID = "valid";
     private static final String KEY_UID = "uid";
     private static final String KEY_RESULT = "result";
+    private  static final String SEPARATOR_COMMA=",";
  
     //HEADERS
     private static final String HEADER_EMAIL = "X-OpenAM-Username";
@@ -71,11 +75,10 @@ public final class OpenamAPIService
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_CONTENT_TYPE_JSON_VALUE = "application/json";
     private static final OpenamAPI _authenticateAPI = SpringContextService.getBean( "mylutece-openam.apiAuthenticate" );
-   private static final OpenamAPI _sessionAPI = SpringContextService.getBean( "mylutece-openam.apiSession" );
+    private static final OpenamAPI _sessionAPI = SpringContextService.getBean( "mylutece-openam.apiSession" );
     private static final OpenamAPI _usersAPI = SpringContextService.getBean( "mylutece-openam.apiUsers" );
     
-    private static Logger _logger = org.apache.log4j.Logger.getLogger( Constants.LOGGER_OPENAM );
-
+  
     /** Private constructor */
     private OpenamAPIService(  )
     {
@@ -98,8 +101,7 @@ public final class OpenamAPIService
         headerParameters.put( HEADER_PASSWORD, strUserPassword );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
-        try
-        {
+      
             strResponse = _authenticateAPI.callMethod( "", null, headerParameters, true );
 
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
@@ -108,12 +110,7 @@ public final class OpenamAPIService
             
             	strTokenId = jo.getString( KEY_TOKEN_ID );
             }
-        }
-        catch ( OpenamAPIException ex )
-        {
-            _logger.error( ex );
-        }
-
+            
         return strTokenId;
     }
 
@@ -131,8 +128,7 @@ public final class OpenamAPIService
         Map<String, String> headerParameters = new HashMap<String, String>(  );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
-        try
-        {
+       
             String strResponse = _sessionAPI.callMethod( strSubjectId + "?_action=validate", null, headerParameters, true );
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
             
@@ -144,13 +140,7 @@ public final class OpenamAPIService
             	return jo.getString(KEY_UID);
             }
             
-        }
-        catch ( OpenamAPIException ex )
-        {
-            _logger.error( ex );
-        }
-
-        return null;
+             return null;
     }
 
     /**
@@ -164,25 +154,17 @@ public final class OpenamAPIService
         Map<String, String> headerParameters = new HashMap<String, String>(  );
         headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
-
-
+        
         String strResult = null;
 
-        try
-        {
-            String strResponse = _sessionAPI.callMethod( "?_action=logout", null, headerParameters, true );
+        String strResponse = _sessionAPI.callMethod( "?_action=logout", null, headerParameters, true );
 
-            JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
-            if(jo.containsKey(KEY_RESULT))
-            {
-            	strResult = jo.getString( KEY_RESULT );
-            }
-        }
-        catch ( OpenamAPIException ex )
+        JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
+        if(jo.containsKey(KEY_RESULT))
         {
-            _logger.error( ex );
+        	strResult = jo.getString( KEY_RESULT );
         }
-
+   
         return strResult;
     }
     
@@ -197,12 +179,14 @@ public final class OpenamAPIService
   public  static Map<String, String> getUserInformations( String strSubjectId ,String strUserId,Map<String, String> mapUserMapping,String strUserAttributeKey)
         throws OpenamAPIException
     {
-        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        
+	  	Map<String, String> headerParameters = new HashMap<String, String>(  );
         headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
         Map<String, String> mapInfos= new HashMap<String, String>(  );
-        try
-        {
-            String strResponse = _usersAPI.callMethod( strUserId, null,headerParameters, true, true );
+        
+        
+        	
+            String strResponse = _usersAPI.callMethod( strUserId +"?_fields="+buildRestrictListOfAttributesReturn(strUserAttributeKey, mapUserMapping), null,headerParameters, true, true );
             JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
             JSONArray joArray;
             if ( jo.containsKey(strUserAttributeKey) )
@@ -214,7 +198,9 @@ public final class OpenamAPIService
             	}
             }
             
-          
+           if( mapUserMapping !=null )
+           {
+        		   
             	for ( Entry<String, String> entry : mapUserMapping.entrySet(  ) )
                 {
                     if ( jo.containsKey(entry.getKey()) )
@@ -227,15 +213,29 @@ public final class OpenamAPIService
 
                     }
                 }
-        }
+           }
+        
                 
-        catch ( OpenamAPIException ex )
-        {
-            _logger.warn( "Metadata API call : users/" + strSubjectId + " - " + ex.getMessage(  ) );
-
-            return null;
-        }
-
+       
         return mapInfos;
     }
+  
+  
+  
+  	private static String buildRestrictListOfAttributesReturn(String strUserAttributeKey,Map<String, String> mapUserMapping)
+  	{
+  		
+  		StringBuffer strFields=new StringBuffer();
+  		strFields.append(strUserAttributeKey);
+  		if(mapUserMapping!=null && !mapUserMapping.isEmpty())
+  		{
+  			for ( Entry<String, String> entry : mapUserMapping.entrySet(  ) )
+            {
+  				strFields.append(SEPARATOR_COMMA);
+  				strFields.append(entry.getKey());
+            }
+  				
+  		}
+  		return strFields.toString();
+  	}
 }
