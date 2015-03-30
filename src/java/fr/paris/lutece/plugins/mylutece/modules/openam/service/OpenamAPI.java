@@ -33,22 +33,15 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.log4j.Logger;
+
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.util.httpaccess.HttpAccess;
 import fr.paris.lutece.util.httpaccess.HttpAccessException;
 import fr.paris.lutece.util.url.UrlItem;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONException;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-
-import org.apache.commons.lang.StringUtils;
-
-import org.apache.log4j.Logger;
-
-import java.util.Map;
-import java.util.Map.Entry;
 
 
 /**
