@@ -55,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class NotifyLuteceUserFilter implements Filter
 {
-    private final static String PARAMETER_LUTECE_USER_NAME = "lutece_user_name";
+    private final static String PARAMETER_UID = "uid";
 
     /**
      *
@@ -78,7 +78,7 @@ public class NotifyLuteceUserFilter implements Filter
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String strGuidParameter = request.getParameter( PARAMETER_LUTECE_USER_NAME );
+        String strGuidParameter = request.getParameter( PARAMETER_UID);
 
         if ( !StringUtils.isEmpty( strGuidParameter ) )
         {
