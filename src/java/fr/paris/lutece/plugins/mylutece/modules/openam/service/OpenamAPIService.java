@@ -54,8 +54,6 @@ public final class OpenamAPIService
     public static final String PCUID = "pcuid";
     public static final String MESSAGE = "message";
     public static final String PARAMETER_SUBJECT_ID = "subjectid";
-    public static final String PARAMETER_ID_ALERTES = "idalertes";
-    public static final String PARAMETER_ID_EMAIL = "id_mail";
     public static final String ERROR_TECHNICAL = "TECHNICAL_ERROR";
     private static final String KEY_TOKEN_ID = "tokenId";
     private static final String KEY_VALID = "valid";
