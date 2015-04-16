@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.security.LuteceUser;
+import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 import javax.security.auth.login.FailedLoginException;
@@ -102,18 +103,28 @@ public class OpenamAuthentication extends PortalAuthentication
     public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
         throws LoginException
     {
-        LuteceUser user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
-
-        if ( user == null )
-        {
-            throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
-                    request.getLocale(  ) ) );
-        }
-
-        //add Openam LuteceUser session
-        OpenamLuteceUserSessionService.getInstance(  )
-                                      .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
-
+    	
+    	 LuteceUser user;
+    	if(SecurityService.getInstance().getRegisteredUser(request)==null)
+    	{	
+    		
+    		    
+    		 user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
+    
+	        if ( user == null )
+	        {
+	            throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
+	                    request.getLocale(  ) ) );
+	        }
+	
+	        //add Openam LuteceUser session
+	        OpenamLuteceUserSessionService.getInstance(  )
+	                                      .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
+	    	}
+    	else
+    	{
+    		user=SecurityService.getInstance().getRegisteredUser(request);
+    	}
         return user;
     }
 
