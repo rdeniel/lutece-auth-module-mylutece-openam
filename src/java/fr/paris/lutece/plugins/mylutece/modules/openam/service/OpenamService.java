@@ -261,7 +261,7 @@ public final class OpenamService
         {
             String strTokenId = getConnectionCookie( request );
 
-            if ( strTokenId != null )
+            if ( !StringUtils.isEmpty(strTokenId) )
             {
                 try
                 {
@@ -339,6 +339,28 @@ public final class OpenamService
 
         response.addCookie( openamCookie );
     }
+    
+    /**
+     * set a paris connect cokkie in the HttpServletResponse
+     *
+     * @param strPCUID
+     *            the user PCUID
+     * @param response
+     *            The HTTP response
+     */
+    public void removeConnectionCookie( HttpServletResponse response )
+    {
+        // remove  openam cookie using the setMaxAgeParameters
+    	Cookie openamCookie = new Cookie( COOKIE_OPENAM_NAME,null );
+        openamCookie.setDomain( COOKIE_OPENAM_DOMAIN );
+        openamCookie.setSecure( COOKIE_OPENAM_SECURE );
+        openamCookie.setMaxAge( 0 );
+        openamCookie.setPath( COOKIE_OPENAM_PATH );
+        response.addCookie( openamCookie );
+    }
+    
+    
+    
 
     /**
      * Fill user's data
