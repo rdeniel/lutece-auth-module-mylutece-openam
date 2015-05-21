@@ -96,14 +96,13 @@ public class OpenamLuteceFilter implements Filter
             }
             else
             {
-            	
-            	String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
-            	//if the request contains connection cookie and the user can not be retrieved  removed connection cookie
-                if ( !StringUtils.isEmpty(strConnexionCookie) )
+                String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
+
+                //if the request contains connection cookie and the user can not be retrieved  removed connection cookie
+                if ( !StringUtils.isEmpty( strConnexionCookie ) )
                 {
-                	//remove connexion cookie
-                    OpenamService.getInstance(  )
-                                 .removeConnectionCookie((HttpServletResponse) response );
+                    //remove connexion cookie
+                    OpenamService.getInstance(  ).removeConnectionCookie( (HttpServletResponse) response );
                 }
             }
         }

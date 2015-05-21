@@ -78,7 +78,7 @@ public class NotifyLuteceUserFilter implements Filter
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String strGuidParameter = request.getParameter( PARAMETER_UID);
+        String strGuidParameter = request.getParameter( PARAMETER_UID );
 
         if ( !StringUtils.isEmpty( strGuidParameter ) )
         {

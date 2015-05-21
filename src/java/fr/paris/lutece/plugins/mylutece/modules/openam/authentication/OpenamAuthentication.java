@@ -33,12 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.authentication;
 
-import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.login.LoginException;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang.StringUtils;
-
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAuthenticationAgentException;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
@@ -53,6 +47,13 @@ import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
+
+import org.apache.commons.lang.StringUtils;
+
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -69,8 +70,6 @@ public class OpenamAuthentication extends PortalAuthentication
     private static final String PROPERTY_MESSAGE_ERROR_LOGIN_AGENT = "module.mylutece.openam.message.error.loginAgent";
     public static final String PROPERTY_BACK_URL_ERROR_AGENT = "mylutece-openam.backUrlErrorAgent";
     public static final String PROPERTY_URL_ERROR_LOGIN_AGENT = "mylutece-openam.urlErrorLoginAgent";
-    
-    
     private static final String CONSTANT_HTTP = "http://";
     private static final String CONSTANT_HTTPS = "https://";
 
@@ -115,59 +114,60 @@ public class OpenamAuthentication extends PortalAuthentication
      */
     @Override
     public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
-        throws LoginException,LoginRedirectException
+        throws LoginException, LoginRedirectException
     {
-    	
-    	 LuteceUser user;
-    	if(SecurityService.getInstance().getRegisteredUser(request)==null)
-    	{	
-    		
-    		    
-    		 try {
-				user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
-			} catch (OpenamAuthenticationAgentException e) {
-				
-				String strUrlErrorLoginAgent= AppPropertiesService.getProperty( PROPERTY_URL_ERROR_LOGIN_AGENT );
-				 String strBackUrlErrorAgent = AppPropertiesService.getProperty( PROPERTY_BACK_URL_ERROR_AGENT );
+        LuteceUser user;
 
-	            if ( StringUtils.isEmpty( strUrlErrorLoginAgent ) )
-	            {
-	                try
-	                {
-	                    SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_LOGIN_AGENT, null, " ", null, "",
-	                        SiteMessage.TYPE_STOP, null, strBackUrlErrorAgent );
-	                }
-	                catch ( SiteMessageException lme )
-	                {
-	                	strUrlErrorLoginAgent = AppPathService.getSiteMessageUrl( request );
-	                }
-	            }
+        if ( SecurityService.getInstance(  ).getRegisteredUser( request ) == null )
+        {
+            try
+            {
+                user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
+            }
+            catch ( OpenamAuthenticationAgentException e )
+            {
+                String strUrlErrorLoginAgent = AppPropertiesService.getProperty( PROPERTY_URL_ERROR_LOGIN_AGENT );
+                String strBackUrlErrorAgent = AppPropertiesService.getProperty( PROPERTY_BACK_URL_ERROR_AGENT );
 
-	            if ( ( strUrlErrorLoginAgent == null ) ||
-	                    ( !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTP ) &&
-	                    !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTPS ) ) )
-	            {
-	            	strUrlErrorLoginAgent = AppPathService.getBaseUrl( request ) + strUrlErrorLoginAgent;
-	            }
+                if ( StringUtils.isEmpty( strUrlErrorLoginAgent ) )
+                {
+                    try
+                    {
+                        SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_LOGIN_AGENT, null, " ", null,
+                            "", SiteMessage.TYPE_STOP, null, strBackUrlErrorAgent );
+                    }
+                    catch ( SiteMessageException lme )
+                    {
+                        strUrlErrorLoginAgent = AppPathService.getSiteMessageUrl( request );
+                    }
+                }
 
-	            LoginRedirectException ex = new LoginRedirectException( strUrlErrorLoginAgent );
-	            throw ex;
-			}
-    
-	        if ( user == null )
-	        {
-	            throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
-	                    request.getLocale(  ) ) );
-	        }
-	
-	        //add Openam LuteceUser session
-	        OpenamLuteceUserSessionService.getInstance(  )
-	                                      .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
-	    	}
-    	else
-    	{
-    		user=SecurityService.getInstance().getRegisteredUser(request);
-    	}
+                if ( ( strUrlErrorLoginAgent == null ) ||
+                        ( !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTP ) &&
+                        !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTPS ) ) )
+                {
+                    strUrlErrorLoginAgent = AppPathService.getBaseUrl( request ) + strUrlErrorLoginAgent;
+                }
+
+                LoginRedirectException ex = new LoginRedirectException( strUrlErrorLoginAgent );
+                throw ex;
+            }
+
+            if ( user == null )
+            {
+                throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
+                        request.getLocale(  ) ) );
+            }
+
+            //add Openam LuteceUser session
+            OpenamLuteceUserSessionService.getInstance(  )
+                                          .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
+        }
+        else
+        {
+            user = SecurityService.getInstance(  ).getRegisteredUser( request );
+        }
+
         return user;
     }
 

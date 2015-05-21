@@ -175,6 +175,7 @@ public final class OpenamService
         if ( isAgentEnabled(  ) )
         {
             headerUserInformations = getUserInformationInHeaderRequest( request );
+
             if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
                     headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
             {
@@ -184,11 +185,10 @@ public final class OpenamService
             }
             else
             {
-            	throw new OpenamAuthenticationAgentException();
+                throw new OpenamAuthenticationAgentException(  );
             }
         }
 
-     
         else
         {
             try
@@ -266,7 +266,7 @@ public final class OpenamService
         {
             String strTokenId = getConnectionCookie( request );
 
-            if ( !StringUtils.isEmpty(strTokenId) )
+            if ( !StringUtils.isEmpty( strTokenId ) )
             {
                 try
                 {
@@ -344,7 +344,7 @@ public final class OpenamService
 
         response.addCookie( openamCookie );
     }
-    
+
     /**
      * set a paris connect cokkie in the HttpServletResponse
      *
@@ -356,16 +356,13 @@ public final class OpenamService
     public void removeConnectionCookie( HttpServletResponse response )
     {
         // remove  openam cookie using the setMaxAgeParameters
-    	Cookie openamCookie = new Cookie( COOKIE_OPENAM_NAME,null );
+        Cookie openamCookie = new Cookie( COOKIE_OPENAM_NAME, null );
         openamCookie.setDomain( COOKIE_OPENAM_DOMAIN );
         openamCookie.setSecure( COOKIE_OPENAM_SECURE );
         openamCookie.setMaxAge( 0 );
         openamCookie.setPath( COOKIE_OPENAM_PATH );
         response.addCookie( openamCookie );
     }
-    
-    
-    
 
     /**
      * Fill user's data
