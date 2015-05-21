@@ -33,14 +33,15 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 
 /**
