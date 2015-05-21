@@ -33,19 +33,26 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.authentication;
 
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+
 import fr.paris.lutece.plugins.mylutece.authentication.PortalAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamAuthenticationAgentException;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamPlugin;
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.message.SiteMessage;
+import fr.paris.lutece.portal.service.message.SiteMessageException;
+import fr.paris.lutece.portal.service.message.SiteMessageService;
+import fr.paris.lutece.portal.service.security.LoginRedirectException;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
+import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import javax.security.auth.login.FailedLoginException;
-import javax.security.auth.login.LoginException;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -59,6 +66,13 @@ public class OpenamAuthentication extends PortalAuthentication
     private static final String PROPERTY_LOST_PASSWORD_URL = "mylutece-openam.url.lostPassword.page";
     private static final String PROPERTY_VIEW_ACCOUNT_URL = "mylutece-openam.url.viewAccount.page";
     private static final String PROPERTY_MESSAGE_FAILED_LOGIN = "module.mylutece.openam.message.error.failedLogin";
+    private static final String PROPERTY_MESSAGE_ERROR_LOGIN_AGENT = "module.mylutece.openam.message.error.loginAgent";
+    public static final String PROPERTY_BACK_URL_ERROR_AGENT = "mylutece-openam.backUrlErrorAgent";
+    public static final String PROPERTY_URL_ERROR_LOGIN_AGENT = "mylutece-openam.urlErrorLoginAgent";
+    
+    
+    private static final String CONSTANT_HTTP = "http://";
+    private static final String CONSTANT_HTTPS = "https://";
 
     /** Lutece User Attributs */
 
@@ -101,7 +115,7 @@ public class OpenamAuthentication extends PortalAuthentication
      */
     @Override
     public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
-        throws LoginException
+        throws LoginException,LoginRedirectException
     {
     	
     	 LuteceUser user;
@@ -109,7 +123,36 @@ public class OpenamAuthentication extends PortalAuthentication
     	{	
     		
     		    
-    		 user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
+    		 try {
+				user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
+			} catch (OpenamAuthenticationAgentException e) {
+				
+				String strUrlErrorLoginAgent= AppPropertiesService.getProperty( PROPERTY_URL_ERROR_LOGIN_AGENT );
+				 String strBackUrlErrorAgent = AppPropertiesService.getProperty( PROPERTY_BACK_URL_ERROR_AGENT );
+
+	            if ( StringUtils.isEmpty( strUrlErrorLoginAgent ) )
+	            {
+	                try
+	                {
+	                    SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_LOGIN_AGENT, null, " ", null, "",
+	                        SiteMessage.TYPE_STOP, null, strBackUrlErrorAgent );
+	                }
+	                catch ( SiteMessageException lme )
+	                {
+	                	strUrlErrorLoginAgent = AppPathService.getSiteMessageUrl( request );
+	                }
+	            }
+
+	            if ( ( strUrlErrorLoginAgent == null ) ||
+	                    ( !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTP ) &&
+	                    !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTPS ) ) )
+	            {
+	            	strUrlErrorLoginAgent = AppPathService.getBaseUrl( request ) + strUrlErrorLoginAgent;
+	            }
+
+	            LoginRedirectException ex = new LoginRedirectException( strUrlErrorLoginAgent );
+	            throw ex;
+			}
     
 	        if ( user == null )
 	        {

@@ -165,7 +165,7 @@ public final class OpenamService
      * @return The LuteceUser
      */
     public OpenamUser doLogin( HttpServletRequest request, String strUserName, String strUserPassword,
-        OpenamAuthentication openamAuthentication )
+        OpenamAuthentication openamAuthentication ) throws OpenamAuthenticationAgentException
     {
         String strTokenId;
         OpenamUser user = null;
@@ -175,15 +175,20 @@ public final class OpenamService
         if ( isAgentEnabled(  ) )
         {
             headerUserInformations = getUserInformationInHeaderRequest( request );
+            if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
+                    headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
+            {
+                user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,
+                        getConnectionCookie( request ) );
+                addUserAttributes( headerUserInformations, user );
+            }
+            else
+            {
+            	throw new OpenamAuthenticationAgentException();
+            }
         }
 
-        if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
-                headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
-        {
-            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,
-                    getConnectionCookie( request ) );
-            addUserAttributes( headerUserInformations, user );
-        }
+     
         else
         {
             try
