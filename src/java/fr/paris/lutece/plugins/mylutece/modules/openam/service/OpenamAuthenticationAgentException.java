@@ -33,6 +33,7 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
+
 /**
  *
  * OpenamAuthenticationAgentException
