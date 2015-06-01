@@ -198,7 +198,7 @@ public final class OpenamService
                 if ( strTokenId != null )
                 {
                     Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId,
-                            strUserName, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
+                            strUserName,COOKIE_OPENAM_NAME, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
 
                     // test contains guid
                     if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
@@ -228,7 +228,7 @@ public final class OpenamService
     {
         try
         {
-            OpenamAPIService.doDisconnect( user.getSubjectId(  ) );
+            OpenamAPIService.doDisconnect(COOKIE_OPENAM_NAME, user.getSubjectId(  ) );
         }
         catch ( OpenamAPIException ex )
         {
@@ -275,7 +275,7 @@ public final class OpenamService
                     if ( strUserId != null )
                     {
                         Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId,
-                                strUserId, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
+                                strUserId,COOKIE_OPENAM_NAME, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
 
                         // test contains guid
                         if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )

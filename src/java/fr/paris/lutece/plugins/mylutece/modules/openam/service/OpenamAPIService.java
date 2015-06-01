@@ -65,7 +65,6 @@ public final class OpenamAPIService
     //HEADERS
     private static final String HEADER_EMAIL = "X-OpenAM-Username";
     private static final String HEADER_PASSWORD = "X-OpenAM-Password";
-    private static final String HEADER_SUBJECT_ID = "iplanetDirectoryPro";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
     private static final String HEADER_CONTENT_TYPE_JSON_VALUE = "application/json";
     private static final OpenamAPI _authenticateAPI = SpringContextService.getBean( "mylutece-openam.apiAuthenticate" );
@@ -135,11 +134,11 @@ public final class OpenamAPIService
      * @param strPCUID the user PCUID
      * @return The response provided by the API in JSON format
      */
-    public static String doDisconnect( String strSubjectId )
+    public static String doDisconnect(String strCookieName, String strSubjectId )
         throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
-        headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
+        headerParameters.put( strCookieName, strSubjectId );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
         String strResult = null;
@@ -161,12 +160,12 @@ public final class OpenamAPIService
      * @param strPCUID The UserID
      * @return The response provided by the API in JSON format
      */
-    public static Map<String, String> getUserInformations( String strSubjectId, String strUserId,
+    public static Map<String, String> getUserInformations( String strSubjectId, String strUserId,String strCookieName,
         Map<String, String> mapUserMapping, String strUserAttributeKey )
         throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
-        headerParameters.put( HEADER_SUBJECT_ID, strSubjectId );
+        headerParameters.put( strCookieName, strSubjectId );
 
         Map<String, String> mapInfos = new HashMap<String, String>(  );
 
