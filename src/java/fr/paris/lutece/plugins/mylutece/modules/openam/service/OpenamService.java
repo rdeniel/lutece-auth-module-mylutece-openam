@@ -33,22 +33,24 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
-import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import org.apache.commons.lang.StringUtils;
-
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
+
+import fr.paris.lutece.plugins.mylutece.authentication.MultiLuteceAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
 
 /**
@@ -77,7 +79,7 @@ public final class OpenamService
     private static int COOKIE_OPENAM_MAX_AGE;
     private static boolean COOKIE_OPENAM_SECURE;
     private static final String SEPARATOR = ",";
-    private static Map<String, String> ATTRIBUTE_USER_MAPPING;
+    private static Map<String, List<String>> ATTRIBUTE_USER_MAPPING;
     private static String ATTRIBUTE_USER_KEY_NAME;
 
     /**
@@ -107,7 +109,7 @@ public final class OpenamService
             ATTRIBUTE_USER_KEY_NAME = AppPropertiesService.getProperty( PROPERTY_USER_KEY_NAME );
 
             String strUserMappingAttributes = AppPropertiesService.getProperty( PROPERTY_USER_MAPPING_ATTRIBUTES );
-            ATTRIBUTE_USER_MAPPING = new HashMap<String, String>(  );
+            ATTRIBUTE_USER_MAPPING = new HashMap<String, List<String>>(  );
 
             if ( StringUtils.isNotBlank( strUserMappingAttributes ) )
             {
@@ -121,7 +123,12 @@ public final class OpenamService
 
                     if ( StringUtils.isNotBlank( userProperties ) )
                     {
-                        ATTRIBUTE_USER_MAPPING.put( userProperties, tabUserProperties[i] );
+                    	if(!ATTRIBUTE_USER_MAPPING.containsKey(userProperties))
+                    	{
+                    		ATTRIBUTE_USER_MAPPING.put(userProperties,new ArrayList<String>());
+                    	}
+                    	ATTRIBUTE_USER_MAPPING.get(userProperties).add(tabUserProperties[i] );
+                		
                     }
                 }
             }
@@ -378,7 +385,10 @@ public final class OpenamService
         {
             if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
             {
-                user.setUserInfo( ATTRIBUTE_USER_MAPPING.get( entry.getKey(  ) ), entry.getValue(  ) );
+            	for(String strUserInfo:ATTRIBUTE_USER_MAPPING.get( entry.getKey(  )))
+            	{
+            		user.setUserInfo(strUserInfo, entry.getValue(  ) );
+            	}
             }
         }
 
@@ -390,9 +400,12 @@ public final class OpenamService
         {
             for ( Entry<String, String> entry : mapIdentitiesInformations.entrySet(  ) )
             {
-                if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
+            	if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
                 {
-                    user.setUserInfo( ATTRIBUTE_USER_MAPPING.get( entry.getKey(  ) ), entry.getValue(  ) );
+                	for(String strUserInfo:ATTRIBUTE_USER_MAPPING.get( entry.getKey(  )))
+                	{
+                		user.setUserInfo(strUserInfo, entry.getValue(  ) );
+                	}
                 }
             }
 
@@ -441,7 +454,7 @@ public final class OpenamService
         return userInformations;
     }
 
-    public Map<String, String> getIdentityInformations( String strName, Map<String, String> attributeUserMapping )
+    public Map<String, String> getIdentityInformations( String strName, Map<String, List<String>> attributeUserMapping )
     {
         for ( IIdentityProviderService identityProviderService : SpringContextService.getBeansOfType( 
                 IIdentityProviderService.class ) )

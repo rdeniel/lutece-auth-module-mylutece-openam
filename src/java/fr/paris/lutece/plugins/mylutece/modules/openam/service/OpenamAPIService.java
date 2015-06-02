@@ -33,15 +33,15 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import fr.paris.lutece.portal.service.spring.SpringContextService;
 
 
 /**
@@ -161,7 +161,7 @@ public final class OpenamAPIService
      * @return The response provided by the API in JSON format
      */
     public static Map<String, String> getUserInformations( String strSubjectId, String strUserId,String strCookieName,
-        Map<String, String> mapUserMapping, String strUserAttributeKey )
+        Map<String, List<String>> mapUserMapping, String strUserAttributeKey )
         throws OpenamAPIException
     {
         Map<String, String> headerParameters = new HashMap<String, String>(  );
@@ -187,7 +187,7 @@ public final class OpenamAPIService
 
         if ( mapUserMapping != null )
         {
-            for ( Entry<String, String> entry : mapUserMapping.entrySet(  ) )
+            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet(  ) )
             {
                 if ( jo.containsKey( entry.getKey(  ) ) )
                 {
@@ -205,14 +205,14 @@ public final class OpenamAPIService
     }
 
     private static String buildRestrictListOfAttributesReturn( String strUserAttributeKey,
-        Map<String, String> mapUserMapping )
+    	Map<String, List<String>> mapUserMapping )
     {
         StringBuffer strFields = new StringBuffer(  );
         strFields.append( strUserAttributeKey );
 
         if ( ( mapUserMapping != null ) && !mapUserMapping.isEmpty(  ) )
         {
-            for ( Entry<String, String> entry : mapUserMapping.entrySet(  ) )
+            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet(  ) )
             {
                 strFields.append( SEPARATOR_COMMA );
                 strFields.append( entry.getKey(  ) );
