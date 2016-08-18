@@ -1,8 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <parent>
         <artifactId>lutece-global-pom</artifactId>
         <groupId>fr.paris.lutece.tools</groupId>
-        <version>3.0.3</version>
+        <version>3.0.7</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -48,9 +49,11 @@
         <jiraProjectName>MMOPENAM</jiraProjectName>
         <jiraComponentId>12867</jiraComponentId>
     </properties>
+    
     <scm>
-        <connection>scm:svn:http://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-openam</connection>
-        <developerConnection>scm:svn:https://dev.lutece.paris.fr/svn/lutece/portal/trunk/plugins/authentication/module-mylutece-openam</developerConnection>
-        <url>http://dev.lutece.paris.fr/viewvc/lutece/portal/trunk/plugins/authentication/module-mylutece-openam</url>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</url>
     </scm>
+    
 </project>
