@@ -330,6 +330,32 @@ public final class OpenamService
 
         return strOpenamCookie;
     }
+    
+    /**
+     * true if the token is validated
+     * @param strTokenId the token id
+     * @return true if the token is validated
+     */
+    public boolean isTokenValidated(String strTokenId )
+    {
+	
+	  if ( !StringUtils.isEmpty( strTokenId ) )
+          {
+              try
+              {
+                  String strUserId = OpenamAPIService.isValidate( strTokenId );
+                  return !StringUtils.isEmpty(strUserId);
+                  
+              }
+              catch ( OpenamAPIException ex )
+              {
+                  OpenamAPI._logger.error( "Error getting Openam user Informations" + ex.getMessage(  ) );
+              }
+          }
+                  
+	return false;
+	
+    }
 
     /**
      * set a paris connect cokkie in the HttpServletResponse
