@@ -34,6 +34,8 @@
 package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
 import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamAuthentication;
+import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser;
+import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamService;
 import fr.paris.lutece.portal.service.security.LoginRedirectException;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 import fr.paris.lutece.portal.service.security.SecurityService;
@@ -41,6 +43,7 @@ import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.util.mvc.xpage.MVCApplication;
 import fr.paris.lutece.portal.util.mvc.xpage.annotations.Controller;
+import fr.paris.lutece.portal.web.LocalVariables;
 import fr.paris.lutece.util.json.AbstractJsonResponse;
 import fr.paris.lutece.util.json.JsonResponse;
 import fr.paris.lutece.util.json.JsonUtil;
@@ -48,6 +51,7 @@ import fr.paris.lutece.util.json.JsonUtil;
 import javax.security.auth.login.LoginException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -131,6 +135,11 @@ public class MyLuteceOpenamXPage extends MVCApplication
                 if ( user != null )
                 {
                     SecurityService.getInstance(  ).registerUser( request, user );
+                    //Add Openam Cookie
+                    HttpServletResponse response = LocalVariables.getResponse(  );
+                    OpenamService.getInstance(  )
+                                 .setConnectionCookie( ((OpenamUser)user).getSubjectId(), (HttpServletResponse) response );
+       
                     jsonResponse = new JsonResponse( Boolean.TRUE );
                 }
             }

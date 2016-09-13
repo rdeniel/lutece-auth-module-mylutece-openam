@@ -108,16 +108,29 @@ public class OpenamLuteceFilter implements Filter
         }
         else if ( user instanceof OpenamUser )
         {
-            String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
-
-            //if the request does not contains the openam connection cookie 
-            if ( ( !StringUtils.isEmpty( ( (OpenamUser) user ).getSubjectId(  ) ) ) &&
-                    ( ( strConnexionCookie == null ) ||
-                    ( !strConnexionCookie.equals( ( (OpenamUser) user ).getSubjectId(  ) ) ) ) )
+            //Validate Token
+          
+            
+            if(!OpenamService.getInstance().isTokenValidated(((OpenamUser) user ).getSubjectId(  )))
             {
-                OpenamService.getInstance(  )
-                             .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
-                    (HttpServletResponse) response );
+        	  //remove connexion cookie and logout user
+                 OpenamService.getInstance(  ).removeConnectionCookie( (HttpServletResponse) response );
+                 SecurityService.getInstance().logoutUser(request);      
+            }
+            else
+            {
+            
+                String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
+    
+                //if the request does not contains the openam connection cookie 
+                if ( ( !StringUtils.isEmpty( ( (OpenamUser) user ).getSubjectId(  ) ) ) &&
+                        ( ( strConnexionCookie == null ) ||
+                        ( !strConnexionCookie.equals( ( (OpenamUser) user ).getSubjectId(  ) ) ) ) )
+                {
+                    OpenamService.getInstance(  )
+                                 .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
+                        (HttpServletResponse) response );
+                }
             }
         }
 
