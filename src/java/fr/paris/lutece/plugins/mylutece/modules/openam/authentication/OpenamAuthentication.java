@@ -55,7 +55,6 @@ import javax.security.auth.login.LoginException;
 
 import javax.servlet.http.HttpServletRequest;
 
-
 /**
  * OpenamAuthentication Authentication
  */
@@ -70,6 +69,8 @@ public class OpenamAuthentication extends PortalAuthentication
     private static final String PROPERTY_MESSAGE_ERROR_LOGIN_AGENT = "module.mylutece.openam.message.error.loginAgent";
     public static final String PROPERTY_BACK_URL_ERROR_AGENT = "mylutece-openam.backUrlErrorAgent";
     public static final String PROPERTY_URL_ERROR_LOGIN_AGENT = "mylutece-openam.urlErrorLoginAgent";
+    public static final String PROPERTY_DEFINE_AS_EXTERNAL_AUTHENTICATION = "mylutece-openam.defineAsExternalAuthenticationModule";
+
     private static final String CONSTANT_HTTP = "http://";
     private static final String CONSTANT_HTTPS = "https://";
 
@@ -78,23 +79,26 @@ public class OpenamAuthentication extends PortalAuthentication
     /**
      * Constructor
      */
-    public OpenamAuthentication(  )
+    public OpenamAuthentication( )
     {
     }
 
     /**
      * Gets the Authentification service name
+     * 
      * @return The name of the authentication service
      */
     @Override
-    public String getAuthServiceName(  )
+    public String getAuthServiceName( )
     {
         return AUTH_SERVICE_NAME;
     }
 
     /**
      * Gets the Authentification type
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return The type of authentication
      */
     @Override
@@ -105,26 +109,29 @@ public class OpenamAuthentication extends PortalAuthentication
 
     /**
      * This methods checks the login info in the base repository
-     *
-     * @param strUserName The username
-     * @param strUserPassword The password
-     * @param request The HTTP request
+     * 
+     * @param strUserName
+     *            The username
+     * @param strUserPassword
+     *            The password
+     * @param request
+     *            The HTTP request
      * @return A LuteceUser object corresponding to the login
-     * @throws LoginException The LoginException
+     * @throws LoginException
+     *             The LoginException
      */
     @Override
-    public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request )
-        throws LoginException, LoginRedirectException
+    public LuteceUser login( String strUserName, String strUserPassword, HttpServletRequest request ) throws LoginException, LoginRedirectException
     {
         LuteceUser user;
 
-        if ( SecurityService.getInstance(  ).getRegisteredUser( request ) == null )
+        if ( SecurityService.getInstance( ).getRegisteredUser( request ) == null )
         {
             try
             {
-                user = OpenamService.getInstance(  ).doLogin( request, strUserName, strUserPassword, this );
+                user = OpenamService.getInstance( ).doLogin( request, strUserName, strUserPassword, this );
             }
-            catch ( OpenamAuthenticationAgentException e )
+            catch( OpenamAuthenticationAgentException e )
             {
                 String strUrlErrorLoginAgent = AppPropertiesService.getProperty( PROPERTY_URL_ERROR_LOGIN_AGENT );
                 String strBackUrlErrorAgent = AppPropertiesService.getProperty( PROPERTY_BACK_URL_ERROR_AGENT );
@@ -133,18 +140,17 @@ public class OpenamAuthentication extends PortalAuthentication
                 {
                     try
                     {
-                        SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_LOGIN_AGENT, null, " ", null,
-                            "", SiteMessage.TYPE_STOP, null, strBackUrlErrorAgent );
+                        SiteMessageService.setMessage( request, PROPERTY_MESSAGE_ERROR_LOGIN_AGENT, null, " ", null, "", SiteMessage.TYPE_STOP, null,
+                                strBackUrlErrorAgent );
                     }
-                    catch ( SiteMessageException lme )
+                    catch( SiteMessageException lme )
                     {
                         strUrlErrorLoginAgent = AppPathService.getSiteMessageUrl( request );
                     }
                 }
 
-                if ( ( strUrlErrorLoginAgent == null ) ||
-                        ( !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTP ) &&
-                        !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTPS ) ) )
+                if ( ( strUrlErrorLoginAgent == null )
+                        || ( !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTP ) && !strUrlErrorLoginAgent.startsWith( CONSTANT_HTTPS ) ) )
                 {
                     strUrlErrorLoginAgent = AppPathService.getBaseUrl( request ) + strUrlErrorLoginAgent;
                 }
@@ -155,17 +161,15 @@ public class OpenamAuthentication extends PortalAuthentication
 
             if ( user == null )
             {
-                throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN,
-                        request.getLocale(  ) ) );
+                throw new FailedLoginException( I18nService.getLocalizedString( PROPERTY_MESSAGE_FAILED_LOGIN, request.getLocale( ) ) );
             }
 
-            //add Openam LuteceUser session
-            OpenamLuteceUserSessionService.getInstance(  )
-                                          .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
+            // add Openam LuteceUser session
+            OpenamLuteceUserSessionService.getInstance( ).addLuteceUserSession( user.getName( ), request.getSession( true ).getId( ) );
         }
         else
         {
-            user = SecurityService.getInstance(  ).getRegisteredUser( request );
+            user = SecurityService.getInstance( ).getRegisteredUser( request );
         }
 
         return user;
@@ -173,30 +177,36 @@ public class OpenamAuthentication extends PortalAuthentication
 
     /**
      * This methods logout the user
-     * @param user The user
+     * 
+     * @param user
+     *            The user
      */
     @Override
     public void logout( LuteceUser user )
     {
-        OpenamService.getInstance(  ).doLogout( (OpenamUser) user );
+        OpenamService.getInstance( ).doLogout( (OpenamUser) user );
     }
 
     /**
      * This method returns an anonymous Lutece user
-     *
+     * 
      * @return An anonymous Lutece user
      */
     @Override
-    public LuteceUser getAnonymousUser(  )
+    public LuteceUser getAnonymousUser( )
     {
         throw new java.lang.UnsupportedOperationException( "getAnonymousUser() is not implemented." );
     }
 
     /**
      * Checks that the current user is associated to a given role
-     * @param user The user
-     * @param request The HTTP request
-     * @param strRole The role name
+     * 
+     * @param user
+     *            The user
+     * @param request
+     *            The HTTP request
+     * @param strRole
+     *            The role name
      * @return Returns true if the user is associated to the role, otherwise false
      */
     @Override
@@ -206,86 +216,97 @@ public class OpenamAuthentication extends PortalAuthentication
     }
 
     /**
-     * Indicate that the authentication uses only HttpRequest data to authenticate
-     * users  (ex : Web Server authentication).
+     * Indicate that the authentication uses only HttpRequest data to authenticate users (ex : Web Server authentication).
+     * 
      * @return true if the authentication service authenticates users only with the Http Request, otherwise false.
      */
-    public boolean isBasedOnHttpAuthentication(  )
+    public boolean isBasedOnHttpAuthentication( )
     {
         return true;
     }
 
     /**
      * Returns a Lutece user object if the user is already authenticated by Openam
-     * @param request The HTTP request
+     * 
+     * @param request
+     *            The HTTP request
      * @return Returns A Lutece User or null if there no user authenticated
      */
     @Override
     public LuteceUser getHttpAuthenticatedUser( HttpServletRequest request )
     {
-        OpenamUser user = OpenamService.getInstance(  ).getHttpAuthenticatedUser( request, this );
+        OpenamUser user = OpenamService.getInstance( ).getHttpAuthenticatedUser( request, this );
 
         if ( user != null )
         {
-            //add Openam LuteceUser session
-            OpenamLuteceUserSessionService.getInstance(  )
-                                          .addLuteceUserSession( user.getName(  ), request.getSession( true ).getId(  ) );
+            // add Openam LuteceUser session
+            OpenamLuteceUserSessionService.getInstance( ).addLuteceUserSession( user.getName( ), request.getSession( true ).getId( ) );
         }
 
         return user;
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getIconUrl(  )
+    public String getIconUrl( )
     {
         return URL_ICON;
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getName(  )
+    public String getName( )
     {
         return OpenamPlugin.PLUGIN_NAME;
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getPluginName(  )
+    public String getPluginName( )
     {
         return OpenamPlugin.PLUGIN_NAME;
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getNewAccountPageUrl(  )
+    public String getNewAccountPageUrl( )
     {
         return AppPropertiesService.getProperty( PROPERTY_CREATE_ACCOUNT_URL );
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getLostPasswordPageUrl(  )
+    public String getLostPasswordPageUrl( )
     {
         return AppPropertiesService.getProperty( PROPERTY_LOST_PASSWORD_URL );
     }
 
     /**
-     *{@inheritDoc}
+     * {@inheritDoc}
      */
     @Override
-    public String getViewAccountPageUrl(  )
+    public String getViewAccountPageUrl( )
     {
         return AppPropertiesService.getProperty( PROPERTY_VIEW_ACCOUNT_URL );
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isExternalAuthentication( )
+    {
+        return AppPropertiesService.getPropertyBoolean( PROPERTY_DEFINE_AS_EXTERNAL_AUTHENTICATION, false );
+    }
+
 }
