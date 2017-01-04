@@ -421,7 +421,8 @@ public final class OpenamService
         Map<String, String> mapIdentitiesInformations;
         //Add Identities Informations
         mapIdentitiesInformations = getIdentityInformations( user.getName(  ), ATTRIBUTE_USER_MAPPING );
-
+        //Add All  Identities Informations in the lutece user attributes map
+        user.getUserInfos( ).putAll( mapIdentitiesInformations );
         if ( mapIdentitiesInformations != null )
         {
             for ( Entry<String, String> entry : mapIdentitiesInformations.entrySet(  ) )
@@ -436,6 +437,7 @@ public final class OpenamService
             }
 
             userInformations.putAll( mapIdentitiesInformations );
+
         }
     }
 
