@@ -490,6 +490,6 @@ public final class OpenamService
             return identityProviderService.getIdentityInformations( strName );
         }
 
-        return null;
+        return new HashMap<String, String>( );
     }
 }
