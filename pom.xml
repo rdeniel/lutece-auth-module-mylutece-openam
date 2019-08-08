@@ -10,7 +10,7 @@
     <groupId>fr.paris.lutece.plugins</groupId>
     <artifactId>module-mylutece-openam</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
     <name>Lutece mylutece openam module</name>
 
     <repositories>
@@ -54,7 +54,7 @@
         <connection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</connection>
         <developerConnection>scm:git:https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</developerConnection>
         <url>https://github.com/lutece-platform/lutece-auth-module-mylutece-openam.git</url>
-      <tag>HEAD</tag>
+      <tag>module-mylutece-openam-1.0.5</tag>
   </scm>
     
 </project>
