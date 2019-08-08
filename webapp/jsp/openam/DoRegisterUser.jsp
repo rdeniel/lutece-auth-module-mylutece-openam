@@ -20,11 +20,15 @@
     	SecurityService.getInstance(  ).registerUser( request, user );
 	}
 	
-	LocalVariables.setLocal( config, request, response );
-	
-	response.sendRedirect( "../site/plugins/mylutece/DoMyLuteceLogin.jsp?auth_provider=mylutece-openam");
-	
-
+	try
+	{
+		LocalVariables.setLocal( config, request, response );
+		response.sendRedirect( "../site/plugins/mylutece/DoMyLuteceLogin.jsp?auth_provider=mylutece-openam");
+	}
+	finally
+	{
+		LocalVariables.setLocal( null, null, null );
+	}
 
 %>
 	
