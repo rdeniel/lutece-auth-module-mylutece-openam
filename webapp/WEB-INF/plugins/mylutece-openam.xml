@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plug-in>
    <name>mylutece-openam</name>
    <class>fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamPlugin</class>
-   <version>1.0.6</version>
+   <version>1.0.7-SNAPSHOT</version>
    <description>module.mylutece.openam.module.description</description>
    <documentation/>
    <installation/>
