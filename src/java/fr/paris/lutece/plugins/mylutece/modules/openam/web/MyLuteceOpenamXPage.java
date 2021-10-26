@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,6 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * MyLuteceOpenamXPage
  *
@@ -67,7 +66,7 @@ public class MyLuteceOpenamXPage extends MVCApplication
     public static final String PAGE_MYLUTECE_OPENAM = "myluteceOpenam";
     private static final long serialVersionUID = -4316691400124512414L;
 
-    //Parameters
+    // Parameters
     private static final String PARAMETER_USERNAME = "username";
     private static final String PARAMETER_PASSWORD = "password";
 
@@ -77,13 +76,14 @@ public class MyLuteceOpenamXPage extends MVCApplication
     // Json ERROR CODE
     private static final String JSON_ERROR_AUTHENTICATION_NOT_ENABLE = "AUTHENTICATION_NOT_ENABLE";
     private static final String JSON_ERROR_LOGIN_ERROR = "LOGIN_ERROR";
-    private OpenamAuthentication _openAmAuthentication = (OpenamAuthentication) SpringContextService.getBean( 
-            "mylutece-openam.authentication" );
+    private OpenamAuthentication _openAmAuthentication = (OpenamAuthentication) SpringContextService.getBean( "mylutece-openam.authentication" );
 
     /**
      * Check if the current user is authenticated
-     * @param request The request
-     * @return A JSON string  containing  true in the field result if the user is authenticated
+     * 
+     * @param request
+     *            The request
+     * @return A JSON string containing true in the field result if the user is authenticated
      */
     public String isUserAuthenticated( HttpServletRequest request )
     {
@@ -91,9 +91,9 @@ public class MyLuteceOpenamXPage extends MVCApplication
 
         LuteceUser user = null;
 
-        if ( SecurityService.isAuthenticationEnable(  ) )
+        if ( SecurityService.isAuthenticationEnable( ) )
         {
-            user = SecurityService.getInstance(  ).getRegisteredUser( request );
+            user = SecurityService.getInstance( ).getRegisteredUser( request );
 
             if ( user != null )
             {
@@ -114,8 +114,10 @@ public class MyLuteceOpenamXPage extends MVCApplication
 
     /**
      * doLoginAuthentication
-     * @param request The request
-     * @return A JSON string  containing  true in the user is authenticated
+     * 
+     * @param request
+     *            The request
+     * @return A JSON string containing true in the user is authenticated
      */
     public String doLogin( HttpServletRequest request )
     {
@@ -126,7 +128,7 @@ public class MyLuteceOpenamXPage extends MVCApplication
 
         LuteceUser user = null;
 
-        if ( SecurityService.isAuthenticationEnable(  ) )
+        if ( SecurityService.isAuthenticationEnable( ) )
         {
             try
             {
@@ -134,24 +136,23 @@ public class MyLuteceOpenamXPage extends MVCApplication
 
                 if ( user != null )
                 {
-                    SecurityService.getInstance(  ).registerUser( request, user );
-                    //Add Openam Cookie
-                    HttpServletResponse response = LocalVariables.getResponse(  );
-                    OpenamService.getInstance(  )
-                                 .setConnectionCookie( ((OpenamUser)user).getSubjectId(), (HttpServletResponse) response );
-       
+                    SecurityService.getInstance( ).registerUser( request, user );
+                    // Add Openam Cookie
+                    HttpServletResponse response = LocalVariables.getResponse( );
+                    OpenamService.getInstance( ).setConnectionCookie( ( (OpenamUser) user ).getSubjectId( ), (HttpServletResponse) response );
+
                     jsonResponse = new JsonResponse( Boolean.TRUE );
                 }
             }
-            catch ( LoginException e )
+            catch( LoginException e )
             {
                 jsonResponse = new OpenamErrorJsonResponse( JSON_ERROR_LOGIN_ERROR,
-                        SecurityTokenService.getInstance(  ).getToken( request, TOKEN_ACTION_LOGIN ) );
+                        SecurityTokenService.getInstance( ).getToken( request, TOKEN_ACTION_LOGIN ) );
             }
-            catch ( LoginRedirectException le )
+            catch( LoginRedirectException le )
             {
                 jsonResponse = new OpenamErrorJsonResponse( JSON_ERROR_LOGIN_ERROR,
-                        SecurityTokenService.getInstance(  ).getToken( request, TOKEN_ACTION_LOGIN ) );
+                        SecurityTokenService.getInstance( ).getToken( request, TOKEN_ACTION_LOGIN ) );
             }
         }
         else

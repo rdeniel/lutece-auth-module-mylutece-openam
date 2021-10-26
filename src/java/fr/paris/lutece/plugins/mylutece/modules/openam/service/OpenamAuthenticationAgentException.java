@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2015, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-
 /**
  *
  * OpenamAuthenticationAgentException
@@ -43,8 +42,8 @@ public class OpenamAuthenticationAgentException extends Exception
 {
     private static final long serialVersionUID = -2375566306839951530L;
 
-    public OpenamAuthenticationAgentException(  )
+    public OpenamAuthenticationAgentException( )
     {
-        super(  );
+        super( );
     }
 }

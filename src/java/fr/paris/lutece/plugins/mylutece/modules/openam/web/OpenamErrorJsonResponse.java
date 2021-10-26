@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2013, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
 import fr.paris.lutece.util.json.ErrorJsonResponse;
 
-
 /**
  *
  * OpenamErrorJsonResponse
@@ -61,14 +60,16 @@ public class OpenamErrorJsonResponse extends ErrorJsonResponse
      *
      * @return get token in json response
      */
-    public String getToken(  )
+    public String getToken( )
     {
         return _strToken;
     }
 
     /**
      * set new token in json response
-     * @param _strToken set token in json response
+     * 
+     * @param _strToken
+     *            set token in json response
      */
     public void setToken( String _strToken )
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
  * ParisConnectLuteceFilters
  *
@@ -66,7 +65,7 @@ public class OpenamLuteceFilter implements Filter
      * {@inheritDoc}
      */
     @Override
-    public void destroy(  )
+    public void destroy( )
     {
         // nothing
     }
@@ -76,63 +75,56 @@ public class OpenamLuteceFilter implements Filter
      * {@inheritDoc}
      */
     @Override
-    public void doFilter( ServletRequest servletRequest, ServletResponse response, FilterChain chain )
-        throws IOException, ServletException
+    public void doFilter( ServletRequest servletRequest, ServletResponse response, FilterChain chain ) throws IOException, ServletException
     {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-        LuteceUser user = SecurityService.getInstance(  ).getRegisteredUser( request );
+        LuteceUser user = SecurityService.getInstance( ).getRegisteredUser( request );
 
-        if ( ( user == null ) ||
-                !OpenamLuteceUserSessionService.getInstance(  )
-                                                   .isLuteceUserUpToDate( request.getSession( true ).getId(  ) ) )
+        if ( ( user == null ) || !OpenamLuteceUserSessionService.getInstance( ).isLuteceUserUpToDate( request.getSession( true ).getId( ) ) )
         {
-            OpenamAuthentication openamAuthentication = (OpenamAuthentication) SpringContextService.getBean( 
-                    "mylutece-openam.authentication" );
+            OpenamAuthentication openamAuthentication = (OpenamAuthentication) SpringContextService.getBean( "mylutece-openam.authentication" );
             user = openamAuthentication.getHttpAuthenticatedUser( request );
 
             if ( user != null )
             {
-                SecurityService.getInstance(  ).registerUser( request, user );
+                SecurityService.getInstance( ).registerUser( request, user );
             }
             else
             {
-                String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
+                String strConnexionCookie = OpenamService.getInstance( ).getConnectionCookie( request );
 
-                //if the request contains connection cookie and the user can not be retrieved  removed connection cookie
+                // if the request contains connection cookie and the user can not be retrieved removed connection cookie
                 if ( !StringUtils.isEmpty( strConnexionCookie ) )
                 {
-                    //remove connexion cookie
-                    OpenamService.getInstance(  ).removeConnectionCookie( (HttpServletResponse) response );
+                    // remove connexion cookie
+                    OpenamService.getInstance( ).removeConnectionCookie( (HttpServletResponse) response );
                 }
             }
         }
-        else if ( user instanceof OpenamUser )
-        {
-            //Validate Token
-          
-            
-            if(!OpenamService.getInstance().isTokenValidated(((OpenamUser) user ).getSubjectId(  )))
+        else
+            if ( user instanceof OpenamUser )
             {
-        	  //remove connexion cookie and logout user
-                 OpenamService.getInstance(  ).removeConnectionCookie( (HttpServletResponse) response );
-                 SecurityService.getInstance().logoutUser(request);      
-            }
-            else
-            {
-            
-                String strConnexionCookie = OpenamService.getInstance(  ).getConnectionCookie( request );
-    
-                //if the request does not contains the openam connection cookie 
-                if ( ( !StringUtils.isEmpty( ( (OpenamUser) user ).getSubjectId(  ) ) ) &&
-                        ( ( strConnexionCookie == null ) ||
-                        ( !strConnexionCookie.equals( ( (OpenamUser) user ).getSubjectId(  ) ) ) ) )
+                // Validate Token
+
+                if ( !OpenamService.getInstance( ).isTokenValidated( ( (OpenamUser) user ).getSubjectId( ) ) )
                 {
-                    OpenamService.getInstance(  )
-                                 .setConnectionCookie( ( (OpenamUser) user ).getSubjectId(  ),
-                        (HttpServletResponse) response );
+                    // remove connexion cookie and logout user
+                    OpenamService.getInstance( ).removeConnectionCookie( (HttpServletResponse) response );
+                    SecurityService.getInstance( ).logoutUser( request );
+                }
+                else
+                {
+
+                    String strConnexionCookie = OpenamService.getInstance( ).getConnectionCookie( request );
+
+                    // if the request does not contains the openam connection cookie
+                    if ( ( !StringUtils.isEmpty( ( (OpenamUser) user ).getSubjectId( ) ) )
+                            && ( ( strConnexionCookie == null ) || ( !strConnexionCookie.equals( ( (OpenamUser) user ).getSubjectId( ) ) ) ) )
+                    {
+                        OpenamService.getInstance( ).setConnectionCookie( ( (OpenamUser) user ).getSubjectId( ), (HttpServletResponse) response );
+                    }
                 }
             }
-        }
 
         chain.doFilter( servletRequest, response );
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2013, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-
 /**
  * OpenamAPIException
  */
@@ -45,9 +44,11 @@ public class OpenamAPIException extends Exception
     private static final long serialVersionUID = -2375566306839951530L;
 
     /**
-    * The constructor
-    * @param strMessage The Message
-    */
+     * The constructor
+     * 
+     * @param strMessage
+     *            The Message
+     */
     public OpenamAPIException( String strMessage )
     {
         super( strMessage );

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2013, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
 import java.util.Map;
 
-
 /**
  *
  * IIdentityProviderService
@@ -45,8 +44,10 @@ public interface IIdentityProviderService
 {
     /**
      *
-     * @param strName the guid of the user
-     * @param attributeUserMapping a map wich contains Key -> The Name of the attribute in the identity provider
+     * @param strName
+     *            the guid of the user
+     * @param attributeUserMapping
+     *            a map wich contains Key -> The Name of the attribute in the identity provider
      *
      * @return a Map containing the users informations
      */

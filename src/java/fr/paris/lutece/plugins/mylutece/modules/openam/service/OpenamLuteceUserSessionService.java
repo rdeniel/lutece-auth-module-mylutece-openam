@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2013, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 public class OpenamLuteceUserSessionService implements IOpenamLuteceUserSessionService
 {
     private static final String BEAN_LUTECE_USER_SESSION_SERVICE = "mylutece-openam.openamLuteceUserSessionService";
@@ -48,13 +47,13 @@ public class OpenamLuteceUserSessionService implements IOpenamLuteceUserSessionS
     private static Map<String, OpenamLuteceUserSession> _hashSession;
     private static Map<String, Set<String>> _hashLuteceUserName;
 
-    public static IOpenamLuteceUserSessionService getInstance(  )
+    public static IOpenamLuteceUserSessionService getInstance( )
     {
         if ( _singleton == null )
         {
             _singleton = SpringContextService.getBean( BEAN_LUTECE_USER_SESSION_SERVICE );
-            _hashSession = new HashMap<String, OpenamLuteceUserSession>(  );
-            _hashLuteceUserName = new HashMap<String, Set<String>>(  );
+            _hashSession = new HashMap<String, OpenamLuteceUserSession>( );
+            _hashLuteceUserName = new HashMap<String, Set<String>>( );
         }
 
         return _singleton;
@@ -62,7 +61,7 @@ public class OpenamLuteceUserSessionService implements IOpenamLuteceUserSessionS
 
     public boolean isLuteceUserUpToDate( String strSession )
     {
-        if ( _hashSession.containsKey( strSession ) && !_hashSession.get( strSession ).isUpToDate(  ) )
+        if ( _hashSession.containsKey( strSession ) && !_hashSession.get( strSession ).isUpToDate( ) )
         {
             _hashSession.get( strSession ).setUpToDate( true );
 
@@ -76,7 +75,7 @@ public class OpenamLuteceUserSessionService implements IOpenamLuteceUserSessionS
     {
         if ( !_hashLuteceUserName.containsKey( strLuteceUserName ) )
         {
-            _hashLuteceUserName.put( strLuteceUserName, new HashSet<String>(  ) );
+            _hashLuteceUserName.put( strLuteceUserName, new HashSet<String>( ) );
         }
 
         _hashLuteceUserName.get( strLuteceUserName ).add( strSession );
@@ -87,14 +86,14 @@ public class OpenamLuteceUserSessionService implements IOpenamLuteceUserSessionS
     {
         if ( _hashSession.containsKey( strSession ) )
         {
-            String strLuteceUserName = _hashSession.get( strSession ).getLuteceUserName(  );
+            String strLuteceUserName = _hashSession.get( strSession ).getLuteceUserName( );
             _hashSession.remove( strSession );
 
             if ( _hashLuteceUserName.containsKey( strLuteceUserName ) )
             {
                 _hashLuteceUserName.get( strLuteceUserName ).remove( strSession );
 
-                if ( _hashLuteceUserName.get( strLuteceUserName ).isEmpty(  ) )
+                if ( _hashLuteceUserName.get( strLuteceUserName ).isEmpty( ) )
                 {
                     _hashLuteceUserName.remove( strLuteceUserName );
                 }

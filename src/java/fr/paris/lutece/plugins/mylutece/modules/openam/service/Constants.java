@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@
  */
 package fr.paris.lutece.plugins.mylutece.modules.openam.service;
 
-
 /**
  * Constants
  */
@@ -42,7 +41,7 @@ public final class Constants
     public static final String LOGGER_OPENAM = "lutece.openam";
 
     /** Private constructor */
-    private Constants(  )
+    private Constants( )
     {
     }
 }

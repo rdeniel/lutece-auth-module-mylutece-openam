@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@ import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
-
 /**
  * OpenamAPIService
  */
@@ -62,7 +61,7 @@ public final class OpenamAPIService
     private static final String KEY_RESULT = "result";
     private static final String SEPARATOR_COMMA = ",";
 
-    //HEADERS
+    // HEADERS
     private static final String HEADER_EMAIL = "X-OpenAM-Username";
     private static final String HEADER_PASSWORD = "X-OpenAM-Password";
     private static final String HEADER_CONTENT_TYPE = "Content-Type";
@@ -72,22 +71,24 @@ public final class OpenamAPIService
     private static final OpenamAPI _usersAPI = SpringContextService.getBean( "mylutece-openam.apiUsers" );
 
     /** Private constructor */
-    private OpenamAPIService(  )
+    private OpenamAPIService( )
     {
     }
 
     /**
      * Process login
-     * @param strUserName The User's name
-     * @param strUserPassword The User's password
+     * 
+     * @param strUserName
+     *            The User's name
+     * @param strUserPassword
+     *            The User's password
      * @return The response provided by the API in JSON format
      */
-    public static String doLogin( String strUserName, String strUserPassword )
-        throws OpenamAPIException
+    public static String doLogin( String strUserName, String strUserPassword ) throws OpenamAPIException
     {
         String strResponse = null;
         String strTokenId = null;
-        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        Map<String, String> headerParameters = new HashMap<String, String>( );
 
         headerParameters.put( HEADER_EMAIL, strUserName );
         headerParameters.put( HEADER_PASSWORD, strUserPassword );
@@ -107,13 +108,14 @@ public final class OpenamAPIService
 
     /**
      * Checks the connection cookie
-     * @param strSubjectId The 'account' cookie value
+     * 
+     * @param strSubjectId
+     *            The 'account' cookie value
      * @return The UID if the cookie is valid otherwyse false
      */
-    public static String isValidate( String strSubjectId )
-        throws OpenamAPIException
+    public static String isValidate( String strSubjectId ) throws OpenamAPIException
     {
-        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        Map<String, String> headerParameters = new HashMap<String, String>( );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
         String strResponse = _sessionAPI.callMethod( strSubjectId + "?_action=validate", null, headerParameters, true );
@@ -131,13 +133,14 @@ public final class OpenamAPIService
 
     /**
      * Process user logout
-     * @param strPCUID the user PCUID
+     * 
+     * @param strPCUID
+     *            the user PCUID
      * @return The response provided by the API in JSON format
      */
-    public static String doDisconnect(String strCookieName, String strSubjectId )
-        throws OpenamAPIException
+    public static String doDisconnect( String strCookieName, String strSubjectId ) throws OpenamAPIException
     {
-        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        Map<String, String> headerParameters = new HashMap<String, String>( );
         headerParameters.put( strCookieName, strSubjectId );
         headerParameters.put( HEADER_CONTENT_TYPE, HEADER_CONTENT_TYPE_JSON_VALUE );
 
@@ -157,21 +160,21 @@ public final class OpenamAPIService
 
     /**
      * Get user infos
-     * @param strPCUID The UserID
+     * 
+     * @param strPCUID
+     *            The UserID
      * @return The response provided by the API in JSON format
      */
-    public static Map<String, String> getUserInformations( String strSubjectId, String strUserId,String strCookieName,
-        Map<String, List<String>> mapUserMapping, String strUserAttributeKey )
-        throws OpenamAPIException
+    public static Map<String, String> getUserInformations( String strSubjectId, String strUserId, String strCookieName,
+            Map<String, List<String>> mapUserMapping, String strUserAttributeKey ) throws OpenamAPIException
     {
-        Map<String, String> headerParameters = new HashMap<String, String>(  );
+        Map<String, String> headerParameters = new HashMap<String, String>( );
         headerParameters.put( strCookieName, strSubjectId );
 
-        Map<String, String> mapInfos = new HashMap<String, String>(  );
+        Map<String, String> mapInfos = new HashMap<String, String>( );
 
-        String strResponse = _usersAPI.callMethod( strUserId + "?_fields=" +
-                buildRestrictListOfAttributesReturn( strUserAttributeKey, mapUserMapping ), null, headerParameters,
-                true, true );
+        String strResponse = _usersAPI.callMethod( strUserId + "?_fields=" + buildRestrictListOfAttributesReturn( strUserAttributeKey, mapUserMapping ), null,
+                headerParameters, true, true );
         JSONObject jo = (JSONObject) JSONSerializer.toJSON( strResponse );
         JSONArray joArray;
 
@@ -179,7 +182,7 @@ public final class OpenamAPIService
         {
             joArray = jo.getJSONArray( strUserAttributeKey );
 
-            for ( int i = 0; i < joArray.size(  ); i++ )
+            for ( int i = 0; i < joArray.size( ); i++ )
             {
                 mapInfos.put( strUserAttributeKey, joArray.getString( i ) );
             }
@@ -187,15 +190,15 @@ public final class OpenamAPIService
 
         if ( mapUserMapping != null )
         {
-            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet(  ) )
+            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet( ) )
             {
-                if ( jo.containsKey( entry.getKey(  ) ) )
+                if ( jo.containsKey( entry.getKey( ) ) )
                 {
-                    joArray = jo.getJSONArray( entry.getKey(  ) );
+                    joArray = jo.getJSONArray( entry.getKey( ) );
 
-                    for ( int i = 0; i < joArray.size(  ); i++ )
+                    for ( int i = 0; i < joArray.size( ); i++ )
                     {
-                        mapInfos.put( entry.getKey(  ), joArray.getString( i ) );
+                        mapInfos.put( entry.getKey( ), joArray.getString( i ) );
                     }
                 }
             }
@@ -204,21 +207,20 @@ public final class OpenamAPIService
         return mapInfos;
     }
 
-    private static String buildRestrictListOfAttributesReturn( String strUserAttributeKey,
-    	Map<String, List<String>> mapUserMapping )
+    private static String buildRestrictListOfAttributesReturn( String strUserAttributeKey, Map<String, List<String>> mapUserMapping )
     {
-        StringBuffer strFields = new StringBuffer(  );
+        StringBuffer strFields = new StringBuffer( );
         strFields.append( strUserAttributeKey );
 
-        if ( ( mapUserMapping != null ) && !mapUserMapping.isEmpty(  ) )
+        if ( ( mapUserMapping != null ) && !mapUserMapping.isEmpty( ) )
         {
-            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet(  ) )
+            for ( Entry<String, List<String>> entry : mapUserMapping.entrySet( ) )
             {
                 strFields.append( SEPARATOR_COMMA );
-                strFields.append( entry.getKey(  ) );
+                strFields.append( entry.getKey( ) );
             }
         }
 
-        return strFields.toString(  );
+        return strFields.toString( );
     }
 }

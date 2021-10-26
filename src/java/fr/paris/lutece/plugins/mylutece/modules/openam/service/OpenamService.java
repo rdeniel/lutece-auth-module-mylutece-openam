@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,6 @@ import fr.paris.lutece.plugins.mylutece.modules.openam.authentication.OpenamUser
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
 
-
 /**
  *
  * OpenamService
@@ -85,7 +84,7 @@ public final class OpenamService
     /**
      * Empty constructor
      */
-    private OpenamService(  )
+    private OpenamService( )
     {
         // nothing
     }
@@ -95,11 +94,11 @@ public final class OpenamService
      *
      * @return the instance
      */
-    public static OpenamService getInstance(  )
+    public static OpenamService getInstance( )
     {
         if ( _singleton == null )
         {
-            _singleton = new OpenamService(  );
+            _singleton = new OpenamService( );
             COOKIE_OPENAM_NAME = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_NAME );
             COOKIE_OPENAM_DOMAIN = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_DOMAIN );
             COOKIE_OPENAM_PATH = AppPropertiesService.getProperty( PROPERTY_COOKIE_OPENAM_PATH );
@@ -109,26 +108,25 @@ public final class OpenamService
             ATTRIBUTE_USER_KEY_NAME = AppPropertiesService.getProperty( PROPERTY_USER_KEY_NAME );
 
             String strUserMappingAttributes = AppPropertiesService.getProperty( PROPERTY_USER_MAPPING_ATTRIBUTES );
-            ATTRIBUTE_USER_MAPPING = new HashMap<String, List<String>>(  );
+            ATTRIBUTE_USER_MAPPING = new HashMap<String, List<String>>( );
 
             if ( StringUtils.isNotBlank( strUserMappingAttributes ) )
             {
-                String[] tabUserProperties = strUserMappingAttributes.split( SEPARATOR );
+                String [ ] tabUserProperties = strUserMappingAttributes.split( SEPARATOR );
                 String userProperties;
 
                 for ( int i = 0; i < tabUserProperties.length; i++ )
                 {
-                    userProperties = AppPropertiesService.getProperty( CONSTANT_LUTECE_USER_PROPERTIES_PATH + "." +
-                            tabUserProperties[i] );
+                    userProperties = AppPropertiesService.getProperty( CONSTANT_LUTECE_USER_PROPERTIES_PATH + "." + tabUserProperties [i] );
 
                     if ( StringUtils.isNotBlank( userProperties ) )
                     {
-                    	if(!ATTRIBUTE_USER_MAPPING.containsKey(userProperties))
-                    	{
-                    		ATTRIBUTE_USER_MAPPING.put(userProperties,new ArrayList<String>());
-                    	}
-                    	ATTRIBUTE_USER_MAPPING.get(userProperties).add(tabUserProperties[i] );
-                		
+                        if ( !ATTRIBUTE_USER_MAPPING.containsKey( userProperties ) )
+                        {
+                            ATTRIBUTE_USER_MAPPING.put( userProperties, new ArrayList<String>( ) );
+                        }
+                        ATTRIBUTE_USER_MAPPING.get( userProperties ).add( tabUserProperties [i] );
+
                     }
                 }
             }
@@ -140,12 +138,11 @@ public final class OpenamService
     /**
      * Inits plugin. Registers authentication
      */
-    public void init(  )
+    public void init( )
     {
         _bAgentEnable = AppPropertiesService.getPropertyBoolean( PROPERTY_AGENT_ENABLE, false );
 
-        OpenamAuthentication authentication = (OpenamAuthentication) SpringContextService.getPluginBean( OpenamPlugin.PLUGIN_NAME,
-                AUTHENTICATION_BEAN_NAME );
+        OpenamAuthentication authentication = (OpenamAuthentication) SpringContextService.getPluginBean( OpenamPlugin.PLUGIN_NAME, AUTHENTICATION_BEAN_NAME );
 
         if ( authentication != null )
         {
@@ -153,8 +150,7 @@ public final class OpenamService
         }
         else
         {
-            OpenamAPI._logger.error( 
-                "OpenamAuthentication not found, please check your openam_context.xml configuration" );
+            OpenamAPI._logger.error( "OpenamAuthentication not found, please check your openam_context.xml configuration" );
         }
     }
 
@@ -171,28 +167,26 @@ public final class OpenamService
      *            The authentication
      * @return The LuteceUser
      */
-    public OpenamUser doLogin( HttpServletRequest request, String strUserName, String strUserPassword,
-        OpenamAuthentication openamAuthentication ) throws OpenamAuthenticationAgentException
+    public OpenamUser doLogin( HttpServletRequest request, String strUserName, String strUserPassword, OpenamAuthentication openamAuthentication )
+            throws OpenamAuthenticationAgentException
     {
         String strTokenId;
         OpenamUser user = null;
 
         Map<String, String> headerUserInformations = null;
 
-        if ( isAgentEnabled(  ) )
+        if ( isAgentEnabled( ) )
         {
             headerUserInformations = getUserInformationInHeaderRequest( request );
 
-            if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
-                    headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
+            if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty( ) && headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
             {
-                user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,
-                        getConnectionCookie( request ) );
+                user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication, getConnectionCookie( request ) );
                 addUserAttributes( headerUserInformations, user );
             }
             else
             {
-                throw new OpenamAuthenticationAgentException(  );
+                throw new OpenamAuthenticationAgentException( );
             }
         }
 
@@ -204,21 +198,20 @@ public final class OpenamService
 
                 if ( strTokenId != null )
                 {
-                    Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId,
-                            strUserName,COOKIE_OPENAM_NAME, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
+                    Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId, strUserName, COOKIE_OPENAM_NAME,
+                            ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
 
                     // test contains guid
                     if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
                     {
-                        user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,
-                                strTokenId );
+                        user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication, strTokenId );
                         addUserAttributes( userInformations, user );
                     }
                 }
             }
-            catch ( OpenamAPIException ex )
+            catch( OpenamAPIException ex )
             {
-                OpenamAPI._logger.error( "Error During Login Openam" + ex.getMessage(  ) );
+                OpenamAPI._logger.error( "Error During Login Openam" + ex.getMessage( ) );
             }
         }
 
@@ -235,11 +228,11 @@ public final class OpenamService
     {
         try
         {
-            OpenamAPIService.doDisconnect(COOKIE_OPENAM_NAME, user.getSubjectId(  ) );
+            OpenamAPIService.doDisconnect( COOKIE_OPENAM_NAME, user.getSubjectId( ) );
         }
-        catch ( OpenamAPIException ex )
+        catch( OpenamAPIException ex )
         {
-            OpenamAPI._logger.error( "Error During Logout Openam" + ex.getMessage(  ) );
+            OpenamAPI._logger.error( "Error During Logout Openam" + ex.getMessage( ) );
         }
     }
 
@@ -257,16 +250,14 @@ public final class OpenamService
         OpenamUser user = null;
         Map<String, String> headerUserInformations = null;
 
-        if ( isAgentEnabled(  ) )
+        if ( isAgentEnabled( ) )
         {
             headerUserInformations = getUserInformationInHeaderRequest( request );
         }
 
-        if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty(  ) &&
-                headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
+        if ( ( headerUserInformations != null ) && !headerUserInformations.isEmpty( ) && headerUserInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
         {
-            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication,
-                    getConnectionCookie( request ) );
+            user = new OpenamUser( headerUserInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication, getConnectionCookie( request ) );
             addUserAttributes( headerUserInformations, user );
         }
         else
@@ -281,21 +272,20 @@ public final class OpenamService
 
                     if ( strUserId != null )
                     {
-                        Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId,
-                                strUserId,COOKIE_OPENAM_NAME, ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
+                        Map<String, String> userInformations = OpenamAPIService.getUserInformations( strTokenId, strUserId, COOKIE_OPENAM_NAME,
+                                ATTRIBUTE_USER_MAPPING, ATTRIBUTE_USER_KEY_NAME );
 
                         // test contains guid
                         if ( ( userInformations != null ) && userInformations.containsKey( ATTRIBUTE_USER_KEY_NAME ) )
                         {
-                            user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ),
-                                    openamAuthentication, strTokenId );
+                            user = new OpenamUser( userInformations.get( ATTRIBUTE_USER_KEY_NAME ), openamAuthentication, strTokenId );
                             addUserAttributes( userInformations, user );
                         }
                     }
                 }
-                catch ( OpenamAPIException ex )
+                catch( OpenamAPIException ex )
                 {
-                    OpenamAPI._logger.error( "Error getting Openam user Informations" + ex.getMessage(  ) );
+                    OpenamAPI._logger.error( "Error getting Openam user Informations" + ex.getMessage( ) );
                 }
             }
         }
@@ -312,49 +302,50 @@ public final class OpenamService
      */
     public String getConnectionCookie( HttpServletRequest request )
     {
-        Cookie[] cookies = request.getCookies(  );
+        Cookie [ ] cookies = request.getCookies( );
         String strOpenamCookie = null;
 
         if ( cookies != null )
         {
             for ( Cookie cookie : cookies )
             {
-                if ( cookie.getName(  ).equals( COOKIE_OPENAM_NAME ) )
+                if ( cookie.getName( ).equals( COOKIE_OPENAM_NAME ) )
                 {
-                    strOpenamCookie = cookie.getValue(  );
-                    OpenamAPI._logger.debug( "getHttpAuthenticatedUser : cookie '" + COOKIE_OPENAM_NAME +
-                        "' found - value=" + strOpenamCookie );
+                    strOpenamCookie = cookie.getValue( );
+                    OpenamAPI._logger.debug( "getHttpAuthenticatedUser : cookie '" + COOKIE_OPENAM_NAME + "' found - value=" + strOpenamCookie );
                 }
             }
         }
 
         return strOpenamCookie;
     }
-    
+
     /**
      * true if the token is validated
-     * @param strTokenId the token id
+     * 
+     * @param strTokenId
+     *            the token id
      * @return true if the token is validated
      */
-    public boolean isTokenValidated(String strTokenId )
+    public boolean isTokenValidated( String strTokenId )
     {
-	
-	  if ( !StringUtils.isEmpty( strTokenId ) )
-          {
-              try
-              {
-                  String strUserId = OpenamAPIService.isValidate( strTokenId );
-                  return !StringUtils.isEmpty(strUserId);
-                  
-              }
-              catch ( OpenamAPIException ex )
-              {
-                  OpenamAPI._logger.error( "Error getting Openam user Informations" + ex.getMessage(  ) );
-              }
-          }
-                  
-	return false;
-	
+
+        if ( !StringUtils.isEmpty( strTokenId ) )
+        {
+            try
+            {
+                String strUserId = OpenamAPIService.isValidate( strTokenId );
+                return !StringUtils.isEmpty( strUserId );
+
+            }
+            catch( OpenamAPIException ex )
+            {
+                OpenamAPI._logger.error( "Error getting Openam user Informations" + ex.getMessage( ) );
+            }
+        }
+
+        return false;
+
     }
 
     /**
@@ -388,7 +379,7 @@ public final class OpenamService
      */
     public void removeConnectionCookie( HttpServletResponse response )
     {
-        // remove  openam cookie using the setMaxAgeParameters
+        // remove openam cookie using the setMaxAgeParameters
         Cookie openamCookie = new Cookie( COOKIE_OPENAM_NAME, null );
         openamCookie.setDomain( COOKIE_OPENAM_DOMAIN );
         openamCookie.setSecure( COOKIE_OPENAM_SECURE );
@@ -407,32 +398,32 @@ public final class OpenamService
      */
     private void addUserAttributes( Map<String, String> userInformations, OpenamUser user )
     {
-        for ( Entry<String, String> entry : userInformations.entrySet(  ) )
+        for ( Entry<String, String> entry : userInformations.entrySet( ) )
         {
-            if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
+            if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey( ) ) )
             {
-            	for(String strUserInfo:ATTRIBUTE_USER_MAPPING.get( entry.getKey(  )))
-            	{
-            		user.setUserInfo(strUserInfo, entry.getValue(  ) );
-            	}
+                for ( String strUserInfo : ATTRIBUTE_USER_MAPPING.get( entry.getKey( ) ) )
+                {
+                    user.setUserInfo( strUserInfo, entry.getValue( ) );
+                }
             }
         }
 
         Map<String, String> mapIdentitiesInformations;
-        //Add Identities Informations
-        mapIdentitiesInformations = getIdentityInformations( user.getName(  ), ATTRIBUTE_USER_MAPPING );
-        //Add All  Identities Informations in the lutece user attributes map
+        // Add Identities Informations
+        mapIdentitiesInformations = getIdentityInformations( user.getName( ), ATTRIBUTE_USER_MAPPING );
+        // Add All Identities Informations in the lutece user attributes map
         user.getUserInfos( ).putAll( mapIdentitiesInformations );
         if ( mapIdentitiesInformations != null )
         {
-            for ( Entry<String, String> entry : mapIdentitiesInformations.entrySet(  ) )
+            for ( Entry<String, String> entry : mapIdentitiesInformations.entrySet( ) )
             {
-            	if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey(  ) ) )
+                if ( ATTRIBUTE_USER_MAPPING.containsKey( entry.getKey( ) ) )
                 {
-                	for(String strUserInfo:ATTRIBUTE_USER_MAPPING.get( entry.getKey(  )))
-                	{
-                		user.setUserInfo(strUserInfo, entry.getValue(  ) );
-                	}
+                    for ( String strUserInfo : ATTRIBUTE_USER_MAPPING.get( entry.getKey( ) ) )
+                    {
+                        user.setUserInfo( strUserInfo, entry.getValue( ) );
+                    }
                 }
             }
 
@@ -445,21 +436,21 @@ public final class OpenamService
      *
      * @return true if the user Agent is enabled
      */
-    private boolean isAgentEnabled(  )
+    private boolean isAgentEnabled( )
     {
         return _bAgentEnable;
     }
 
     private Map<String, String> getUserInformationInHeaderRequest( HttpServletRequest request )
     {
-        Map<String, String> userInformations = new HashMap<String, String>(  );
-        Enumeration headerNames = request.getHeaderNames(  );
+        Map<String, String> userInformations = new HashMap<String, String>( );
+        Enumeration headerNames = request.getHeaderNames( );
 
         String strKey;
 
-        while ( headerNames.hasMoreElements(  ) )
+        while ( headerNames.hasMoreElements( ) )
         {
-            strKey = (String) headerNames.nextElement(  );
+            strKey = (String) headerNames.nextElement( );
 
             if ( ATTRIBUTE_USER_MAPPING.containsKey( strKey ) || ATTRIBUTE_USER_KEY_NAME.equals( strKey ) )
             {
@@ -469,12 +460,12 @@ public final class OpenamService
 
         if ( OpenamAPI._bDebug )
         {
-            headerNames = request.getHeaderNames(  );
+            headerNames = request.getHeaderNames( );
             OpenamAPI._logger.debug( "Openam Headers Informations" );
 
-            while ( headerNames.hasMoreElements(  ) )
+            while ( headerNames.hasMoreElements( ) )
             {
-                strKey = (String) headerNames.nextElement(  );
+                strKey = (String) headerNames.nextElement( );
                 OpenamAPI._logger.debug( strKey + "=" + request.getHeader( strKey ) );
             }
         }
@@ -484,8 +475,7 @@ public final class OpenamService
 
     public Map<String, String> getIdentityInformations( String strName, Map<String, List<String>> attributeUserMapping )
     {
-        for ( IIdentityProviderService identityProviderService : SpringContextService.getBeansOfType( 
-                IIdentityProviderService.class ) )
+        for ( IIdentityProviderService identityProviderService : SpringContextService.getBeansOfType( IIdentityProviderService.class ) )
         {
             return identityProviderService.getIdentityInformations( strName );
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.authentication;
 import fr.paris.lutece.portal.service.security.LuteceAuthentication;
 import fr.paris.lutece.portal.service.security.LuteceUser;
 
-
 /**
  * OpenamUser
  */
@@ -51,8 +50,11 @@ public class OpenamUser extends LuteceUser
 
     /**
      * Constructor
-     * @param strUserName The user's name
-     * @param authenticationService The authentication service that authenticates the user
+     * 
+     * @param strUserName
+     *            The user's name
+     * @param authenticationService
+     *            The authentication service that authenticates the user
      */
     public OpenamUser( String strUserName, LuteceAuthentication authenticationService )
     {
@@ -60,10 +62,13 @@ public class OpenamUser extends LuteceUser
     }
 
     /**
-    * Constructor
-    * @param strUserName The user's name
-    * @param authenticationService The authentication service that authenticates the user
-    */
+     * Constructor
+     * 
+     * @param strUserName
+     *            The user's name
+     * @param authenticationService
+     *            The authentication service that authenticates the user
+     */
     public OpenamUser( String strUserName, LuteceAuthentication authenticationService, String strSubjectId )
     {
         super( strUserName, authenticationService );
@@ -74,14 +79,16 @@ public class OpenamUser extends LuteceUser
      *
      * @return the user openam token id
      */
-    public String getSubjectId(  )
+    public String getSubjectId( )
     {
         return _strSubjectId;
     }
 
     /**
      * set the user openam token id
-     * @param strSubjectId the user pcuid
+     * 
+     * @param strSubjectId
+     *            the user pcuid
      */
     public void setSubjectId( String strSubjectId )
     {
@@ -94,7 +101,7 @@ public class OpenamUser extends LuteceUser
      * @return The Email
      */
     @Override
-    public String getEmail(  )
+    public String getEmail( )
     {
         return getUserInfo( LuteceUser.HOME_INFO_ONLINE_EMAIL );
     }

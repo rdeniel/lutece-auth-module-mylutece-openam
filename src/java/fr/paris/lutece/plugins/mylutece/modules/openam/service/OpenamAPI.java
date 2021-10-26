@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002-2014, Mairie de Paris
+ * Copyright (c) 2002-2021, City of Paris
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 /**
  * OpenamAPI
  */
@@ -54,7 +53,7 @@ public class OpenamAPI
     public static Logger _logger = Logger.getLogger( Constants.LOGGER_OPENAM );
     public static boolean _bDebug = AppPropertiesService.getPropertyBoolean( PROPERTY_API_CALL_DEBUG, false );
 
-    // Variables declarations 
+    // Variables declarations
     private String _strName;
     private String _strUrl;
     private Map _map;
@@ -64,7 +63,7 @@ public class OpenamAPI
      *
      * @return The Name
      */
-    public String getName(  )
+    public String getName( )
     {
         return _strName;
     }
@@ -72,7 +71,8 @@ public class OpenamAPI
     /**
      * Sets the Name
      *
-     * @param strName The Name
+     * @param strName
+     *            The Name
      */
     public void setName( String strName )
     {
@@ -84,7 +84,7 @@ public class OpenamAPI
      *
      * @return The Url
      */
-    public String getUrl(  )
+    public String getUrl( )
     {
         return _strUrl;
     }
@@ -92,7 +92,8 @@ public class OpenamAPI
     /**
      * Sets the Url
      *
-     * @param strUrl The Url
+     * @param strUrl
+     *            The Url
      */
     public void setUrl( String strUrl )
     {
@@ -104,7 +105,7 @@ public class OpenamAPI
      *
      * @return The Map
      */
-    public Map getMap(  )
+    public Map getMap( )
     {
         return _map;
     }
@@ -112,7 +113,8 @@ public class OpenamAPI
     /**
      * Sets the Map
      *
-     * @param map The Map
+     * @param map
+     *            The Map
      */
     public void setMap( Map map )
     {
@@ -121,57 +123,73 @@ public class OpenamAPI
 
     /**
      * Call a Method of the API
-     * @param strMethod The method name
-     * @param mapParameters Parameters
+     * 
+     * @param strMethod
+     *            The method name
+     * @param mapParameters
+     *            Parameters
      * @return The string returned by the API
-     * @throws OpenamAPIException if an error occurs
+     * @throws OpenamAPIException
+     *             if an error occurs
      */
-    public String callMethod( String strMethod, Map<String, String> mapParameters )
-        throws OpenamAPIException
+    public String callMethod( String strMethod, Map<String, String> mapParameters ) throws OpenamAPIException
     {
         return callMethod( strMethod, mapParameters, null );
     }
 
     /**
      * Call a Method of the API
-     * @param strMethod The method name
-     * @param mapParameters Parameters
-     * @param mapHeaders Headers
+     * 
+     * @param strMethod
+     *            The method name
+     * @param mapParameters
+     *            Parameters
+     * @param mapHeaders
+     *            Headers
      * @return The string returned by the API
-     * @throws OpenamAPIException if an error occurs
+     * @throws OpenamAPIException
+     *             if an error occurs
      */
-    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders )
-        throws OpenamAPIException
+    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders ) throws OpenamAPIException
     {
         return callMethod( strMethod, mapParameters, mapHeaders, true );
     }
 
     /**
      * Call a Method of the API
-     * @param strMethod The method name
-     * @param mapParameters Parameters
-     * @param bJSON Is JSON output
+     * 
+     * @param strMethod
+     *            The method name
+     * @param mapParameters
+     *            Parameters
+     * @param bJSON
+     *            Is JSON output
      * @return The string returned by the API
-     * @throws OpenamAPIException if an error occurs
+     * @throws OpenamAPIException
+     *             if an error occurs
      */
-    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
-        boolean bJSON ) throws OpenamAPIException
+    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders, boolean bJSON ) throws OpenamAPIException
     {
         return callMethod( strMethod, mapParameters, mapHeaders, bJSON, false );
     }
 
     /**
      * Call a Method of the API
-     * @param strMethod The method name
-     * @param mapParameters Parameters
-     * @param bJSON Is JSON output
+     * 
+     * @param strMethod
+     *            The method name
+     * @param mapParameters
+     *            Parameters
+     * @param bJSON
+     *            Is JSON output
      * @return The string returned by the API
-     * @throws OpenamAPIException if an error occurs
+     * @throws OpenamAPIException
+     *             if an error occurs
      */
-    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders,
-        boolean bJSON, boolean bGet ) throws OpenamAPIException
+    public String callMethod( String strMethod, Map<String, String> mapParameters, Map<String, String> mapHeaders, boolean bJSON, boolean bGet )
+            throws OpenamAPIException
     {
-        HttpAccess httpAccess = new HttpAccess(  );
+        HttpAccess httpAccess = new HttpAccess( );
         UrlItem url = new UrlItem( _strUrl + strMethod );
 
         String strResponse = "";
@@ -180,76 +198,79 @@ public class OpenamAPI
         {
             if ( bGet )
             {
-                strResponse = httpAccess.doGet( url.getUrl(  ), null, null, mapHeaders );
+                strResponse = httpAccess.doGet( url.getUrl( ), null, null, mapHeaders );
             }
             else
             {
-                strResponse = httpAccess.doPost( url.getUrl(  ), mapParameters, null, null, mapHeaders );
+                strResponse = httpAccess.doPost( url.getUrl( ), mapParameters, null, null, mapHeaders );
             }
 
             if ( _bDebug )
             {
-                _logger.debug( "API call : " + getCallUrl( url.getUrl(  ), mapParameters ) );
+                _logger.debug( "API call : " + getCallUrl( url.getUrl( ), mapParameters ) );
             }
 
-            //        if ( !StringUtils.isEmpty( strResponse ) )
-            //        {
-            //        	
-            //        	checkJSONforErrors( strResponse );
-            //           
-            //        }
+            // if ( !StringUtils.isEmpty( strResponse ) )
+            // {
+            //
+            // checkJSONforErrors( strResponse );
+            //
+            // }
         }
-        catch ( HttpAccessException ex )
+        catch( HttpAccessException ex )
         {
-            _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage(  ), ex );
-            throw new OpenamAPIException( ex.getResponseCode(  ).toString(  ) );
+            _logger.error( "Error calling method '" + strMethod + " - " + ex.getMessage( ), ex );
+            throw new OpenamAPIException( ex.getResponseCode( ).toString( ) );
         }
 
         return strResponse;
     }
 
-    //    /**
-    //     * Ckecks JSON for errors
-    //     * @param strResponse The response in JSON format
-    //     * @throws OpenamAPIException if an error occurs
-    //     */
-    //    private void checkJSONforErrors( String strResponse )
-    //        throws OpenamAPIException
-    //    {
-    //        JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
+    // /**
+    // * Ckecks JSON for errors
+    // * @param strResponse The response in JSON format
+    // * @throws OpenamAPIException if an error occurs
+    // */
+    // private void checkJSONforErrors( String strResponse )
+    // throws OpenamAPIException
+    // {
+    // JSONObject joObject = (JSONObject) JSONSerializer.toJSON( strResponse );
     //
-    //        if ( joObject.containsKey( KEY_ERROR ) )
-    //        {
-    //            String strError = joObject.getString( KEY_ERROR );
-    //            String strMessage;
+    // if ( joObject.containsKey( KEY_ERROR ) )
+    // {
+    // String strError = joObject.getString( KEY_ERROR );
+    // String strMessage;
     //
-    //            // ERR value is not always a JSON object
-    //            try
-    //            {
-    //                JSON joError = JSONSerializer.toJSON( strError );
+    // // ERR value is not always a JSON object
+    // try
+    // {
+    // JSON joError = JSONSerializer.toJSON( strError );
     //
-    //                if ( !joError.isArray(  ) )
-    //                {
-    //                    strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
-    //                }
-    //                else
-    //                {
-    //                    strMessage = joError.toString(  );
-    //                }
-    //            }
-    //            catch ( JSONException e )
-    //            {
-    //                strMessage = strError;
-    //            }
+    // if ( !joError.isArray( ) )
+    // {
+    // strMessage = ( (JSONObject) joError ).getString( KEY_ERROR_MSG );
+    // }
+    // else
+    // {
+    // strMessage = joError.toString( );
+    // }
+    // }
+    // catch ( JSONException e )
+    // {
+    // strMessage = strError;
+    // }
     //
-    //            throw new OpenamAPIException( strMessage );
-    //        }
-    //    }
+    // throw new OpenamAPIException( strMessage );
+    // }
+    // }
 
     /**
      * Build the URL
-     * @param strUrl The base URL
-     * @param mapParameters Parameters
+     * 
+     * @param strUrl
+     *            The base URL
+     * @param mapParameters
+     *            Parameters
      * @return The full URL
      */
     private String getCallUrl( String strUrl, Map<String, String> mapParameters )
@@ -258,12 +279,12 @@ public class OpenamAPI
 
         if ( mapParameters != null )
         {
-            for ( Entry<String, String> entry : mapParameters.entrySet(  ) )
+            for ( Entry<String, String> entry : mapParameters.entrySet( ) )
             {
-                url.addParameter( entry.getKey(  ), entry.getValue(  ) );
+                url.addParameter( entry.getKey( ), entry.getValue( ) );
             }
         }
 
-        return url.getUrl(  );
+        return url.getUrl( );
     }
 }
