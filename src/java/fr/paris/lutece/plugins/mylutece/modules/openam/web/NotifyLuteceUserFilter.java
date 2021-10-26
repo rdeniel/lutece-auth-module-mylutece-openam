@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.mylutece.modules.openam.web;
 
 import fr.paris.lutece.plugins.mylutece.modules.openam.service.OpenamLuteceUserSessionService;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
